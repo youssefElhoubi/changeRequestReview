@@ -1,0 +1,52 @@
+<div
+  class="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm"
+>
+  <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+    <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-600">
+      <tr>
+        <th scope="col" class="px-4 py-3 font-semibold">Title</th>
+        <th scope="col" class="px-4 py-3 font-semibold">Status</th>
+        <th scope="col" class="px-4 py-3 font-semibold">Created by</th>
+        <th scope="col" class="px-4 py-3 font-semibold">Created</th>
+        <th scope="col" class="px-4 py-3 text-right font-semibold">Changes</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-200">
+      <tr
+        *ngFor="let row of rows; trackBy: trackById"
+        data-testid="cr-row"
+        class="cursor-pointer transition-colors hover:bg-slate-50 focus-within:bg-slate-50"
+        tabindex="0"
+        (click)="onRowClick(row)"
+        (keydown.enter)="onRowClick(row)"
+        (keydown.space)="$event.preventDefault(); onRowClick(row)"
+      >
+        <td class="whitespace-nowrap px-4 py-3 font-medium text-slate-900">
+          {{ row.title }}
+        </td>
+        <td class="whitespace-nowrap px-4 py-3">
+          <span
+            class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold"
+            [ngClass]="{
+              'bg-slate-100 text-slate-700': row.status === 'draft',
+              'bg-amber-100 text-amber-800': row.status === 'pending_review',
+              'bg-emerald-100 text-emerald-800': row.status === 'approved',
+              'bg-rose-100 text-rose-800': row.status === 'rejected',
+            }"
+          >
+            {{ row.status.replace("_", " ") }}
+          </span>
+        </td>
+        <td class="whitespace-nowrap px-4 py-3 text-slate-700">
+          {{ row.createdBy.name }}
+        </td>
+        <td class="whitespace-nowrap px-4 py-3 text-slate-700">
+          {{ row.createdAt | date: "mediumDate" }}
+        </td>
+        <td class="whitespace-nowrap px-4 py-3 text-right text-slate-700">
+          {{ row.changeCount }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
