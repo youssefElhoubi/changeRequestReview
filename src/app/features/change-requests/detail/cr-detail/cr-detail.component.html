@@ -1,0 +1,60 @@
+<main
+  class="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6 lg:px-8"
+  aria-live="polite"
+>
+  <button
+    type="button"
+    class="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+    (click)="onBack()"
+  >
+    Back to change requests
+  </button>
+
+  <section *ngIf="vm$ | async as vm">
+    <div
+      *ngIf="vm.state === 'loading'"
+      class="rounded-lg border border-slate-200 bg-white p-8 text-center"
+      aria-busy="true"
+    >
+      Loading change request...
+    </div>
+
+    <div
+      *ngIf="vm.state === 'error'"
+      class="rounded-lg border border-rose-200 bg-rose-50 p-6 text-rose-800"
+      role="alert"
+    >
+      {{ vm.errorMessage }}
+    </div>
+
+    <ng-container *ngIf="vm.changeRequest as cr">
+      <div
+        *ngIf="vm.errorMessage"
+        class="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-4 text-rose-800"
+        role="alert"
+      >
+        {{ vm.errorMessage }}
+      </div>
+      <header class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+        <p
+          class="text-sm font-semibold uppercase tracking-wide text-indigo-600"
+        >
+          {{ cr.status.replace("_", " ") }}
+        </p>
+        <h1 class="mt-1 text-3xl font-bold text-slate-900">{{ cr.title }}</h1>
+        <p class="mt-3 text-slate-600">{{ cr.description }}</p>
+      </header>
+
+      <app-cr-actions
+        [changeRequest]="cr"
+        [canApprove]="vm.canApprove"
+        [canReject]="vm.canReject"
+        [actionInFlight]="vm.state === 'action-in-flight'"
+        (approve)="onApprove($event)"
+        (reject)="onReject($event)"
+      ></app-cr-actions>
+      <app-cr-diff-table [changes]="cr.changes"></app-cr-diff-table>
+      <app-cr-timeline [events]="cr.timeline"></app-cr-timeline>
+    </ng-container>
+  </section>
+</main>

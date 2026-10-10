@@ -1,0 +1,41 @@
+<section
+  class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+  [attr.aria-busy]="actionInFlight"
+>
+  <div class="flex flex-wrap gap-3">
+    <button
+      type="button"
+      data-testid="approve-btn"
+      class="rounded-md bg-emerald-600 px-4 py-2 font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+      [disabled]="!canApprove || actionInFlight"
+      (click)="onApprove()"
+    >
+      {{ actionInFlight ? "Saving..." : "Approve" }}
+    </button>
+    <button
+      type="button"
+      data-testid="reject-btn"
+      class="rounded-md bg-rose-600 px-4 py-2 font-semibold text-white hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+      [disabled]="!canReject || actionInFlight"
+      (click)="onReject()"
+    >
+      Reject
+    </button>
+  </div>
+  <label
+    class="mt-4 block text-sm font-medium text-slate-700"
+    for="reject-reason"
+    >Rejection reason</label
+  >
+  <textarea
+    id="reject-reason"
+    data-testid="reject-reason"
+    class="mt-1 w-full rounded-md border border-slate-300 p-2 focus-visible:ring-2 focus-visible:ring-indigo-500"
+    rows="3"
+    [(ngModel)]="reason"
+    [disabled]="!canReject || actionInFlight"
+  ></textarea>
+  <p *ngIf="validationMessage" class="mt-2 text-sm text-rose-700" role="alert">
+    {{ validationMessage }}
+  </p>
+</section>

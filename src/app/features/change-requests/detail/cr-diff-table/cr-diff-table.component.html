@@ -1,0 +1,66 @@
+<section class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+  <h2 class="text-xl font-semibold text-slate-900">Proposed changes</h2>
+  <div class="mt-4 overflow-x-auto">
+    <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+      <thead class="bg-slate-50 text-xs uppercase text-slate-600">
+        <tr>
+          <th class="px-4 py-3">Field</th>
+          <th class="px-4 py-3">Old value</th>
+          <th class="px-4 py-3">New value</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3">Delta</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-200">
+        <tr
+          *ngFor="let change of changes; trackBy: trackById"
+          data-testid="diff-row"
+        >
+          <td class="px-4 py-3 font-medium text-slate-900">
+            {{ change.field }}
+          </td>
+          <td class="px-4 py-3 text-slate-600">{{ display(change.before) }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ display(change.after) }}</td>
+          <td class="px-4 py-3">
+            <span
+              data-testid="diff-status"
+              class="rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700"
+            >
+              {{ classification(change) }}
+            </span>
+          </td>
+          <td
+            class="px-4 py-3 font-semibold"
+            [ngClass]="{
+              'text-emerald-700': (delta(change) ?? 0) > 0,
+              'text-rose-700': (delta(change) ?? 0) < 0,
+            }"
+          >
+            {{
+              delta(change) === null ? "—" : (delta(change) | number: "1.0-2")
+            }}
+          </td>
+        </tr>
+      </tbody>
+      <tfoot
+        class="border-t-2 border-slate-300 bg-slate-50 font-semibold text-slate-900"
+      >
+        <tr data-testid="diff-totals">
+          <th class="px-4 py-3 text-left">Totals</th>
+          <td class="px-4 py-3">{{ totalBefore() | number: "1.0-2" }}</td>
+          <td class="px-4 py-3">{{ totalAfter() | number: "1.0-2" }}</td>
+          <td class="px-4 py-3">Overall delta</td>
+          <td
+            class="px-4 py-3"
+            [ngClass]="{
+              'text-emerald-700': overallDelta() > 0,
+              'text-rose-700': overallDelta() < 0,
+            }"
+          >
+            {{ overallDelta() | number: "1.0-2" }}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</section>
