@@ -1,41 +1,51 @@
 <section
-  class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+  class="rounded-panel border border-line bg-surface p-6 shadow-surface"
   [attr.aria-busy]="actionInFlight"
 >
-  <div class="flex flex-wrap gap-3">
-    <button
-      type="button"
-      data-testid="approve-btn"
-      class="rounded-md bg-emerald-600 px-4 py-2 font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
-      [disabled]="!canApprove || actionInFlight"
-      (click)="onApprove()"
-    >
-      {{ actionInFlight ? "Saving..." : "Approve" }}
-    </button>
-    <button
-      type="button"
-      data-testid="reject-btn"
-      class="rounded-md bg-rose-600 px-4 py-2 font-semibold text-white hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
-      [disabled]="!canReject || actionInFlight"
-      (click)="onReject()"
-    >
-      Reject
-    </button>
+  <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+    <div>
+      <h2 class="text-lg font-semibold text-ink">Review decision</h2>
+      <p class="mt-1 text-sm text-muted">
+        Confirm the proposed change or return it with a clear reason.
+      </p>
+    </div>
+    <div class="flex flex-wrap gap-3">
+      <button
+        type="button"
+        data-testid="approve-btn"
+        class="rounded-control bg-success-600 px-4 py-2 font-semibold text-white transition duration-standard hover:bg-success-700 disabled:cursor-not-allowed disabled:opacity-50"
+        [disabled]="!canApprove || actionInFlight"
+        (click)="onApprove()"
+      >
+        {{ actionInFlight ? "Saving..." : "Approve" }}
+      </button>
+      <button
+        type="button"
+        data-testid="reject-btn"
+        class="rounded-control border border-danger-600 bg-surface px-4 py-2 font-semibold text-danger-700 transition duration-standard hover:bg-danger-50 disabled:cursor-not-allowed disabled:opacity-50"
+        [disabled]="!canReject || actionInFlight"
+        (click)="onReject()"
+      >
+        Reject
+      </button>
+    </div>
   </div>
-  <label
-    class="mt-4 block text-sm font-medium text-slate-700"
-    for="reject-reason"
+  <label class="mt-5 block text-sm font-medium text-ink" for="reject-reason"
     >Rejection reason</label
   >
   <textarea
     id="reject-reason"
     data-testid="reject-reason"
-    class="mt-1 w-full rounded-md border border-slate-300 p-2 focus-visible:ring-2 focus-visible:ring-indigo-500"
+    class="mt-1 w-full rounded-control border border-line bg-surface p-3 text-ink shadow-surface focus:border-brand-500 focus:outline-none"
     rows="3"
     [(ngModel)]="reason"
     [disabled]="!canReject || actionInFlight"
   ></textarea>
-  <p *ngIf="validationMessage" class="mt-2 text-sm text-rose-700" role="alert">
+  <p
+    *ngIf="validationMessage"
+    class="mt-2 text-sm text-danger-700"
+    role="alert"
+  >
     {{ validationMessage }}
   </p>
 </section>
