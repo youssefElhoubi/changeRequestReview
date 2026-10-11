@@ -73,6 +73,47 @@ describe('AppComponent', () => {
     expect(fixture.nativeElement.querySelector('router-outlet')).not.toBeNull();
   });
 
+  it.each([
+    {
+      role: 'viewer' as const,
+      permissions: [UserPermission.ViewChangeRequests],
+      visibleLinks: ['Change requests'],
+      hiddenLinks: ['New request', 'My requests', 'Create user'],
+    },
+    {
+      role: 'requester' as const,
+      permissions: [
+        UserPermission.ViewChangeRequests,
+        UserPermission.CreateChangeRequests,
+      ],
+      visibleLinks: ['Change requests', 'New request', 'My requests'],
+      hiddenLinks: ['Create user'],
+    },
+  ])('keeps $role navigation limited to its permissions', (access) => {
+    authState$.next({
+      status: 'authenticated',
+      user: {
+        id: `u-${access.role}`,
+        name: access.role,
+        passeord: 'Dev123!ChangeMe',
+        role: access.role,
+        permissions: access.permissions,
+      },
+      error: null,
+    });
+    fixture.detectChanges();
+
+    const navigation = fixture.nativeElement.querySelector(
+      '#authenticated-navigation',
+    ) as HTMLElement;
+    for (const link of access.visibleLinks) {
+      expect(navigation.textContent).toContain(link);
+    }
+    for (const link of access.hiddenLinks) {
+      expect(navigation.textContent).not.toContain(link);
+    }
+  });
+
   it('logs out and returns to the public login route', () => {
     fixture.componentInstance.logout();
 

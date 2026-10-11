@@ -1,16 +1,16 @@
 <ng-container *ngIf="authState$ | async as authState">
   <main
     *ngIf="authState.status === 'loading'; else applicationContent"
-    class="flex min-h-screen items-center justify-center bg-slate-50 px-4"
+    class="flex min-h-screen items-center justify-center bg-canvas px-4"
     aria-busy="true"
     aria-live="polite"
   >
     <div
-      class="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-5 py-4 text-sm font-medium text-slate-700 shadow-sm"
+      class="flex items-center gap-3 rounded-panel border border-line bg-surface px-5 py-4 text-sm font-medium text-muted shadow-surface"
       role="status"
     >
       <svg
-        class="h-5 w-5 animate-spin text-indigo-600"
+        class="h-5 w-5 animate-spin text-brand-600"
         viewBox="0 0 24 24"
         fill="none"
         aria-hidden="true"
@@ -34,74 +34,192 @@
   </main>
 
   <ng-template #applicationContent>
-    <header
+    <div
       *ngIf="authState.status === 'authenticated' && authState.user as user"
-      class="border-b border-slate-200 bg-white"
+      class="app-shell"
     >
-      <div
-        class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8"
+      <button
+        *ngIf="isNavigationOpen"
+        type="button"
+        class="app-sidebar-backdrop"
+        aria-label="Close navigation"
+        (click)="closeNavigation()"
+      ></button>
+
+      <aside
+        class="app-sidebar flex flex-col p-4 sm:p-5"
+        [class.is-open]="isNavigationOpen"
       >
         <a
           routerLink="/change-requests"
-          class="text-sm font-semibold uppercase tracking-wide text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+          class="app-wordmark mb-6 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-brand-600"
+          (click)="closeNavigation()"
         >
+          <span
+            class="flex h-8 w-8 items-center justify-center rounded-control bg-brand-600 text-xs font-bold text-white"
+          >
+            CR
+          </span>
           Change request review
         </a>
 
         <nav
-          class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm"
+          id="authenticated-navigation"
+          class="flex flex-1 flex-col gap-1 text-sm"
           aria-label="Authenticated navigation"
         >
           <a
             *ngIf="user.permissions.includes(viewPermission)"
             routerLink="/change-requests"
-            routerLinkActive="font-semibold text-slate-900"
+            routerLinkActive="bg-brand-50 font-semibold text-brand-700"
             [routerLinkActiveOptions]="{ exact: true }"
-            class="text-slate-600 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+            class="app-nav-link rounded-control px-3 py-2 text-muted transition duration-standard hover:bg-brand-50 hover:text-brand-700"
+            (click)="closeNavigation()"
           >
+            <svg
+              class="app-nav-icon"
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M3 4.5h14M3 10h14M3 15.5h14"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+              />
+            </svg>
             Change requests
           </a>
           <a
             *ngIf="canCreateRequests(authState)"
             routerLink="/change-requests/create"
-            routerLinkActive="font-semibold text-slate-900"
-            class="text-slate-600 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+            routerLinkActive="bg-brand-50 font-semibold text-brand-700"
+            class="app-nav-link rounded-control px-3 py-2 text-muted transition duration-standard hover:bg-brand-50 hover:text-brand-700"
+            (click)="closeNavigation()"
           >
+            <svg
+              class="app-nav-icon"
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M10 4v12M4 10h12"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+              />
+            </svg>
             New request
           </a>
           <a
             *ngIf="canCreateRequests(authState)"
             routerLink="/change-requests/my-requests"
-            routerLinkActive="font-semibold text-slate-900"
-            class="text-slate-600 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+            routerLinkActive="bg-brand-50 font-semibold text-brand-700"
+            class="app-nav-link rounded-control px-3 py-2 text-muted transition duration-standard hover:bg-brand-50 hover:text-brand-700"
+            (click)="closeNavigation()"
           >
+            <svg
+              class="app-nav-icon"
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M10 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM4 16.5a6 6 0 0 1 12 0"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+              />
+            </svg>
             My requests
           </a>
           <a
             *ngIf="canCreateUsers(authState)"
             routerLink="/users/create"
-            routerLinkActive="font-semibold text-slate-900"
-            class="text-slate-600 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+            routerLinkActive="bg-brand-50 font-semibold text-brand-700"
+            class="app-nav-link rounded-control px-3 py-2 text-muted transition duration-standard hover:bg-brand-50 hover:text-brand-700"
+            (click)="closeNavigation()"
           >
+            <svg
+              class="app-nav-icon"
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M10 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM4 16.5a6 6 0 0 1 12 0ZM15 5v4M13 7h4"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
             Create user
           </a>
-          <span class="border-l border-slate-200 pl-4 text-slate-600">
-            Signed in as
-            <strong class="font-semibold text-slate-900">{{
-              user.name
-            }}</strong>
-          </span>
-          <button
-            type="button"
-            class="rounded-md border border-slate-300 px-3 py-1.5 font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
-            (click)="logout()"
-          >
-            Log out
-          </button>
         </nav>
-      </div>
-    </header>
+      </aside>
 
-    <router-outlet></router-outlet>
+      <main class="app-content">
+        <header class="app-header">
+          <div class="flex min-w-0 items-center gap-3">
+            <button
+              type="button"
+              class="app-menu-button rounded-control border border-line p-2 text-muted transition duration-standard hover:border-brand-500 hover:bg-brand-50 hover:text-brand-700"
+              [attr.aria-expanded]="isNavigationOpen"
+              aria-controls="authenticated-navigation"
+              aria-label="Toggle navigation"
+              (click)="toggleNavigation()"
+            >
+              <svg
+                class="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3 4.5h14M3 10h14M3 15.5h14"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+            <div class="min-w-0">
+              <p
+                class="text-xs font-semibold uppercase tracking-wide text-muted"
+              >
+                Workspace
+              </p>
+              <h1 class="truncate text-base font-semibold text-ink">
+                {{ currentPageContext() }}
+              </h1>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="hidden text-right text-sm sm:block">
+              <span class="block text-xs text-muted">
+                Signed in as
+                <strong class="font-semibold text-ink">{{ user.name }}</strong>
+              </span>
+            </span>
+            <span class="app-user-avatar" aria-hidden="true">
+              {{ user.name.charAt(0).toUpperCase() }}
+            </span>
+            <button
+              type="button"
+              class="app-logout-button rounded-control px-3 py-2 text-sm font-semibold text-muted transition duration-standard hover:bg-brand-50 hover:text-brand-700"
+              (click)="logout()"
+            >
+              Log out
+            </button>
+          </div>
+        </header>
+        <router-outlet></router-outlet>
+      </main>
+    </div>
+
+    <router-outlet *ngIf="authState.status !== 'authenticated'"></router-outlet>
   </ng-template>
 </ng-container>
