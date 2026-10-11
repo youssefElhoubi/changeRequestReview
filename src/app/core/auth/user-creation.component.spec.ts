@@ -87,9 +87,7 @@ describe('UserCreationComponent', () => {
     expect(
       fixture.nativeElement.querySelector('#user-creation-title'),
     ).not.toBeNull();
-    expect(
-      fixture.nativeElement.querySelectorAll('input').length,
-    ).toBe(3);
+    expect(fixture.nativeElement.querySelectorAll('input').length).toBe(3);
   });
 
   it('shows the duplicate-email error from the creation service', () => {
