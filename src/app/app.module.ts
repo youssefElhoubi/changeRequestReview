@@ -12,6 +12,8 @@ import { MockAuthenticationProvider } from './core/auth/mock-authentication.prov
 import { UserCreationComponent } from './core/auth/user-creation.component';
 import { UserManagementService } from './core/auth/user-management.service';
 import { ReactiveFormsModule } from '@angular/forms';
+import { LoginComponent } from './core/auth/login.component';
+import { ForbiddenComponent } from './core/auth/forbidden.component';
 
 export function initializeMockData(
   storage: MockDataStorageService,
@@ -20,7 +22,12 @@ export function initializeMockData(
 }
 
 @NgModule({
-  declarations: [AppComponent, UserCreationComponent],
+  declarations: [
+    AppComponent,
+    UserCreationComponent,
+    LoginComponent,
+    ForbiddenComponent,
+  ],
   imports: [
     BrowserModule,
     HttpClientModule,

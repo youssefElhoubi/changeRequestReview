@@ -1,11 +1,24 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { UserPermission } from './features/change-requests/models/change-request.models';
+import { AuthGuard } from './core/auth/auth.guard';
+import { ForbiddenComponent } from './core/auth/forbidden.component';
+import { LoginComponent } from './core/auth/login.component';
 import { UserCreationComponent } from './core/auth/user-creation.component';
 
 const routes: Routes = [
-  { path: 'users/create', component: UserCreationComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'forbidden', component: ForbiddenComponent },
+  {
+    path: 'users/create',
+    component: UserCreationComponent,
+    canActivate: [AuthGuard],
+    data: { role: 'approver' },
+  },
   {
     path: 'change-requests',
+    canActivate: [AuthGuard],
+    data: { permission: UserPermission.ViewChangeRequests },
     loadChildren: () =>
       import('./features/change-requests/change-requests.module').then(
         (module) => module.ChangeRequestsModule,

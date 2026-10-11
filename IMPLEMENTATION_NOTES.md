@@ -32,3 +32,7 @@ Authentication is isolated behind `AuthenticationProvider`; the current provider
 ## Audit logging
 
 The only existing user-record mutation is `MockAuthenticationProvider.createUser`; `MockDataStorageService.saveUsers` remains a persistence primitive and is intentionally not audited to avoid duplicate entries during initialization and reset. Successful creation and duplicate-email failures are recorded by `AuditLogService`, including the existing mock actor ID, target ID/email, timestamp, outcome, description, and non-sensitive changed-field names. If audit persistence fails after a user write, creation rolls back the user record and in-memory credential digest. There are currently no user update or delete methods, so those operations remain unaudited. Mock audit logs live in browser storage and are mutable by the user; trusted, tamper-resistant audit history and identity verification require a backend.
+
+## Route guards
+
+`AuthGuard` waits for the reactive authentication state to leave `loading`, redirects unauthenticated navigation to the public login route with a `returnUrl`, and redirects authenticated users without the route's existing role or permission requirement to `/forbidden`. These are client-side navigation controls only; the mock guard is not a security boundary. A real backend must independently verify sessions and enforce authorization on every protected operation.
