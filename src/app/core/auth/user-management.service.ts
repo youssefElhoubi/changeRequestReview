@@ -7,6 +7,8 @@ import {
   User,
   UserCreationError,
   UserCreationState,
+  UserPermission,
+  UserRole,
 } from '../../features/change-requests/models/change-request.models';
 import { AuthenticationProvider } from './authentication-provider';
 import { validateCreateUserInput } from './credential-validation';
@@ -73,6 +75,18 @@ export class UserManagementService implements OnDestroy {
     );
   }
 
+  updateUser(
+    userId: string,
+    changes: { role?: UserRole; permissions?: UserPermission[] },
+  ): Observable<User> {
+    if (!this.provider.updateUser) {
+      return throwError(
+        () => new Error('User updating is not supported by the provider.'),
+      );
+    }
+    return from(this.provider.updateUser(userId, changes));
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -102,6 +116,14 @@ export class UserManagementService implements OnDestroy {
       return {
         code: 'DUPLICATE_EMAIL',
         message: 'A user with this email already exists.',
+      };
+    }
+
+    if (error instanceof Error && error.message === 'UNAUTHORIZED') {
+      return {
+        code: 'UNAUTHORIZED',
+        message:
+          'Only authorized administrators can create or configure users.',
       };
     }
 

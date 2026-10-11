@@ -140,4 +140,21 @@ describe('CrListComponent', () => {
       fixture.nativeElement.querySelector('[data-testid="cr-row"]'),
     ).toBeNull();
   });
+
+  it('renders dashboard summary metric counts for pending, approved, and total requests', () => {
+    createComponent(of(rows));
+
+    const summarySection = fixture.nativeElement.querySelector(
+      '[aria-label="Change request summary"]',
+    );
+    expect(summarySection).not.toBeNull();
+    expect(summarySection.textContent).toContain('Total requests');
+    expect(summarySection.textContent).toContain('2');
+    expect(summarySection.textContent).toContain('Pending review');
+    expect(summarySection.textContent).toContain('1');
+    expect(summarySection.textContent).toContain('Approved');
+    expect(summarySection.textContent).toContain('1');
+    expect(summarySection.textContent).toContain('Rejected');
+    expect(summarySection.textContent).toContain('0');
+  });
 });

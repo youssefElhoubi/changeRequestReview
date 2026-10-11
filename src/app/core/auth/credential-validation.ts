@@ -1,4 +1,6 @@
 import {
+  ALL_USER_PERMISSIONS,
+  ALL_USER_ROLES,
   CreateUserInput,
   LoginCredentials,
 } from '../../features/change-requests/models/change-request.models';
@@ -34,6 +36,22 @@ export function validateCreateUserInput(input: CreateUserInput): string | null {
 
   if (!isValidPassword(input.password)) {
     return 'Password must be at least 8 characters and include uppercase, lowercase, and a number.';
+  }
+
+  if (input.role !== undefined && !ALL_USER_ROLES.includes(input.role)) {
+    return 'Select a valid user role.';
+  }
+
+  if (input.permissions !== undefined) {
+    if (!Array.isArray(input.permissions)) {
+      return 'Permissions must be provided as a list.';
+    }
+    const hasInvalid = input.permissions.some(
+      (perm) => !ALL_USER_PERMISSIONS.includes(perm),
+    );
+    if (hasInvalid) {
+      return 'One or more selected permissions are invalid.';
+    }
   }
 
   return null;

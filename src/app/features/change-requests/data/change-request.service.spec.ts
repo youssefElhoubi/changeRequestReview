@@ -118,4 +118,58 @@ describe('ChangeRequestService status updates', () => {
       'submitted',
     ]);
   }));
+
+  it('prevents self-approval when the approver created the request', fakeAsync(() => {
+    // cr-1001 was created by u-bob
+    storage.setCurrentUserId('u-bob');
+
+    let error: unknown;
+    service.approve('cr-1001').subscribe({
+      error: (value) => (error = value),
+    });
+    tick(501);
+
+    expect(error).toMatchObject({ status: 403 });
+    expect(
+      storage.getChangeRequests().find((request) => request.id === 'cr-1001')
+        ?.status,
+    ).toBe(ChangeRequestStatus.PendingReview);
+  }));
+
+  it('rejects changes to requests already in final states (409 Conflict)', fakeAsync(() => {
+    storage.setCurrentUserId('u-alice');
+    resolve(service.approve('cr-1001'));
+
+    let secondApproveError: unknown;
+    service.approve('cr-1001').subscribe({
+      error: (value) => (secondApproveError = value),
+    });
+    tick(501);
+
+    expect(secondApproveError).toMatchObject({ status: 409 });
+
+    let rejectAfterApproveError: unknown;
+    service.reject('cr-1001', 'Too late').subscribe({
+      error: (value) => (rejectAfterApproveError = value),
+    });
+    tick(501);
+
+    expect(rejectAfterApproveError).toMatchObject({ status: 409 });
+  }));
+
+  it('reflects updated status in request list and retains it across new storage instance', fakeAsync(() => {
+    storage.setCurrentUserId('u-alice');
+    resolve(service.approve('cr-1001'));
+
+    const list = resolve(service.getChangeRequests());
+    const itemInList = list.find((item) => item.id === 'cr-1001');
+    expect(itemInList?.status).toBe(ChangeRequestStatus.Approved);
+
+    // Simulating app refresh with fresh storage
+    const reloadedStorage = new MockDataStorageService();
+    const persisted = reloadedStorage
+      .getChangeRequests()
+      .find((item) => item.id === 'cr-1001');
+    expect(persisted?.status).toBe(ChangeRequestStatus.Approved);
+  }));
 });

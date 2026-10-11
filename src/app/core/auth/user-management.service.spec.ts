@@ -11,7 +11,7 @@ import {
 
 describe('UserManagementService', () => {
   let service: UserManagementService;
-  let provider: { createUser: jest.Mock };
+  let provider: { createUser: jest.Mock; updateUser?: jest.Mock };
   const validInput: CreateUserInput = {
     name: 'New User',
     email: 'new@example.com',
@@ -97,5 +97,65 @@ describe('UserManagementService', () => {
     });
     await firstValueFrom(first);
     expect(provider.createUser).toHaveBeenCalledTimes(1);
+  });
+
+  it('passes configured role and permissions to the provider', async () => {
+    const inputWithRole: CreateUserInput = {
+      ...validInput,
+      role: 'approver',
+      permissions: [
+        UserPermission.ViewChangeRequests,
+        UserPermission.ApproveChangeRequests,
+      ],
+    };
+
+    await firstValueFrom(service.createUser(inputWithRole));
+    expect(provider.createUser).toHaveBeenCalledWith(inputWithRole);
+  });
+
+  it('exposes an UNAUTHORIZED error state when provider rejects unauthorized creation', async () => {
+    provider.createUser.mockRejectedValue(new Error('UNAUTHORIZED'));
+
+    await expect(
+      firstValueFrom(service.createUser(validInput)),
+    ).rejects.toMatchObject({
+      code: 'UNAUTHORIZED',
+    });
+
+    expect(await firstValueFrom(service.creationState$)).toMatchObject({
+      status: 'error',
+      error: { code: 'UNAUTHORIZED' },
+    });
+  });
+
+  it('calls updateUser on the provider when available', async () => {
+    const updateUserMock = jest.fn().mockResolvedValue({
+      id: 'u-edit',
+      role: 'requester',
+      permissions: [
+        UserPermission.ViewChangeRequests,
+        UserPermission.CreateChangeRequests,
+      ],
+    });
+    provider.updateUser = updateUserMock;
+
+    const result = await firstValueFrom(
+      service.updateUser('u-edit', {
+        role: 'requester',
+        permissions: [
+          UserPermission.ViewChangeRequests,
+          UserPermission.CreateChangeRequests,
+        ],
+      }),
+    );
+
+    expect(result.role).toBe('requester');
+    expect(updateUserMock).toHaveBeenCalledWith('u-edit', {
+      role: 'requester',
+      permissions: [
+        UserPermission.ViewChangeRequests,
+        UserPermission.CreateChangeRequests,
+      ],
+    });
   });
 });

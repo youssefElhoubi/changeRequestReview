@@ -1,12 +1,17 @@
 import { Injectable } from '@angular/core';
 
 import {
+  ALL_USER_PERMISSIONS,
+  ALL_USER_ROLES,
   AuthenticationResult,
   CreateUserInput,
   DEFAULT_NEW_USER_PERMISSIONS,
   DEFAULT_NEW_USER_ROLE,
   LoginCredentials,
+  ROLE_DEFAULT_PERMISSIONS,
   User,
+  UserPermission,
+  UserRole,
 } from '../../features/change-requests/models/change-request.models';
 import { MockDataStorageService } from '../api/mock-data-storage.service';
 import { AuthenticationProvider } from './authentication-provider';
@@ -58,6 +63,18 @@ export class MockAuthenticationProvider extends AuthenticationProvider {
       throw new Error('INVALID_INPUT');
     }
 
+    const actorId = this.getActorUserId();
+    const actor = this.storage
+      .getUsers()
+      .find((candidate) => candidate.id === actorId);
+    if (!actor || actor.role !== 'approver') {
+      this.recordCreateFailure(
+        input.email,
+        'Unauthorized attempt to create a user: actor must have the approver role.',
+      );
+      throw new Error('UNAUTHORIZED');
+    }
+
     const email = normalizeEmail(input.email);
     const users = this.storage.getUsers();
     if (
@@ -73,13 +90,18 @@ export class MockAuthenticationProvider extends AuthenticationProvider {
       throw new Error('DUPLICATE_EMAIL');
     }
 
+    const role = input.role ?? DEFAULT_NEW_USER_ROLE;
+    const permissions = input.permissions
+      ? [...input.permissions]
+      : [...(ROLE_DEFAULT_PERMISSIONS[role] ?? DEFAULT_NEW_USER_PERMISSIONS)];
+
     const user: User = {
       id: this.createUserId(),
       name: input.name.trim(),
       email,
       passeord: input.password,
-      role: DEFAULT_NEW_USER_ROLE,
-      permissions: [...DEFAULT_NEW_USER_PERMISSIONS],
+      role,
+      permissions,
     };
     this.storage.saveUsers([...users, user]);
     try {
@@ -87,7 +109,7 @@ export class MockAuthenticationProvider extends AuthenticationProvider {
         actorUserId: this.getActorUserId(),
         action: 'user.created',
         targetUserId: user.id,
-        description: 'Created a viewer user with view-only access.',
+        description: `Created a ${user.role} user with ${user.permissions.length} permission(s).`,
         outcome: 'success',
         changedFields: ['name', 'email', 'role', 'permissions'],
       });
@@ -95,6 +117,48 @@ export class MockAuthenticationProvider extends AuthenticationProvider {
       this.storage.saveUsers(users);
       throw error;
     }
+    return user;
+  }
+
+  override async updateUser(
+    userId: string,
+    changes: { role?: UserRole; permissions?: UserPermission[] },
+  ): Promise<User> {
+    const actorId = this.getActorUserId();
+    const actor = this.storage
+      .getUsers()
+      .find((candidate) => candidate.id === actorId);
+    if (!actor || actor.role !== 'approver') {
+      throw new Error('UNAUTHORIZED');
+    }
+
+    const users = this.storage.getUsers();
+    const user = users.find((candidate) => candidate.id === userId);
+    if (!user) {
+      throw new Error('USER_NOT_FOUND');
+    }
+
+    if (changes.role !== undefined && ALL_USER_ROLES.includes(changes.role)) {
+      user.role = changes.role;
+    }
+    if (
+      changes.permissions !== undefined &&
+      Array.isArray(changes.permissions)
+    ) {
+      user.permissions = changes.permissions.filter((p) =>
+        ALL_USER_PERMISSIONS.includes(p),
+      );
+    }
+
+    this.storage.saveUsers(users);
+    this.auditLog.record({
+      actorUserId: actorId,
+      action: 'user.updated',
+      targetUserId: user.id,
+      description: `Updated role and permissions for user ${user.id}.`,
+      outcome: 'success',
+      changedFields: ['role', 'permissions'],
+    });
     return user;
   }
 

@@ -4,6 +4,7 @@ import { MOCK_USERS } from '../api/mock-data';
 import { MockDataStorageService } from '../api/mock-data-storage.service';
 import { MockAuthenticationProvider } from './mock-authentication.provider';
 import { AuditLogService } from './audit-log.service';
+import { UserPermission } from '../../features/change-requests/models/change-request.models';
 
 describe('MockAuthenticationProvider user creation', () => {
   let provider: MockAuthenticationProvider;
@@ -205,5 +206,104 @@ describe('MockAuthenticationProvider user creation', () => {
     expect(
       storage.getUsers().some((user) => user.email === 'rollback@example.com'),
     ).toBe(false);
+  });
+
+  it('creates an approver with customized permissions and verifies audit logging', async () => {
+    const user = await provider.createUser({
+      name: 'Custom Approver',
+      email: 'custom.approver@example.com',
+      password: 'StrongPass1',
+      role: 'approver',
+      permissions: [
+        UserPermission.ViewChangeRequests,
+        UserPermission.ApproveChangeRequests,
+      ],
+    });
+
+    expect(user).toMatchObject({
+      role: 'approver',
+      permissions: [
+        UserPermission.ViewChangeRequests,
+        UserPermission.ApproveChangeRequests,
+      ],
+    });
+
+    const persisted = storage.getUserById(user.id);
+    expect(persisted.role).toBe('approver');
+    expect(persisted.permissions).toEqual([
+      UserPermission.ViewChangeRequests,
+      UserPermission.ApproveChangeRequests,
+    ]);
+  });
+
+  it('prevents user creation when actor is not an approver (privilege escalation check)', async () => {
+    // Carol is a viewer, not an approver
+    storage.setCurrentUserId('u-carol');
+
+    await expect(
+      provider.createUser({
+        name: 'Unauthorized Created User',
+        email: 'unauth@example.com',
+        password: 'StrongPass1',
+        role: 'approver',
+      }),
+    ).rejects.toThrow('UNAUTHORIZED');
+
+    expect(
+      storage.getUsers().some((u) => u.email === 'unauth@example.com'),
+    ).toBe(false);
+  });
+
+  it('rejects invalid roles and invalid permissions', async () => {
+    await expect(
+      provider.createUser({
+        name: 'Bad Role',
+        email: 'badrole@example.com',
+        password: 'StrongPass1',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        role: 'superuser' as any,
+      }),
+    ).rejects.toThrow('INVALID_INPUT');
+
+    await expect(
+      provider.createUser({
+        name: 'Bad Perm',
+        email: 'badperm@example.com',
+        password: 'StrongPass1',
+        role: 'viewer',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        permissions: ['delete_database' as any],
+      }),
+    ).rejects.toThrow('INVALID_INPUT');
+  });
+
+  it('updates a user role and permissions through updateUser', async () => {
+    const created = await provider.createUser({
+      name: 'Editable User',
+      email: 'editable@example.com',
+      password: 'StrongPass1',
+      role: 'viewer',
+    });
+
+    const updated = await provider.updateUser(created.id, {
+      role: 'requester',
+      permissions: [
+        UserPermission.ViewChangeRequests,
+        UserPermission.CreateChangeRequests,
+      ],
+    });
+
+    expect(updated.role).toBe('requester');
+    expect(updated.permissions).toEqual([
+      UserPermission.ViewChangeRequests,
+      UserPermission.CreateChangeRequests,
+    ]);
+
+    const persisted = storage.getUserById(created.id);
+    expect(persisted.role).toBe('requester');
+    expect(persisted.permissions).toEqual([
+      UserPermission.ViewChangeRequests,
+      UserPermission.CreateChangeRequests,
+    ]);
   });
 });

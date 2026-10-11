@@ -18,6 +18,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
 import { ChangeRequestService } from '../../data/change-request.service';
 import {
   ChangeRequest,
+  ChangeRequestStatus,
   UserPermission,
 } from '../../models/change-request.models';
 
@@ -123,7 +124,7 @@ export class CrDetailComponent implements OnInit, OnDestroy {
             'loaded',
             updated,
             null,
-            updated.status === 'approved'
+            updated.status === ChangeRequestStatus.Approved
               ? 'Change request approved successfully.'
               : 'Change request rejected successfully.',
           ),
@@ -148,7 +149,7 @@ export class CrDetailComponent implements OnInit, OnDestroy {
     permission = UserPermission.ApproveChangeRequests,
   ): boolean {
     return (
-      changeRequest.status === 'pending_review' &&
+      changeRequest.status === ChangeRequestStatus.PendingReview &&
       changeRequest.createdBy.id !== this.authService.currentUserIdValue &&
       this.authService.hasRole('approver') &&
       this.authService.hasPermission(permission)

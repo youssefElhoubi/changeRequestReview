@@ -52,15 +52,19 @@
         >
           <div>
             <dt class="text-xs uppercase tracking-wider text-slate-400">
-              Default role
+              Selected role
             </dt>
-            <dd class="mt-1 text-sm font-medium text-slate-100">Viewer</dd>
+            <dd class="mt-1 text-sm font-medium text-slate-100">
+              {{ getRoleLabel(form.controls.role.value) }}
+            </dd>
           </div>
           <div>
             <dt class="text-xs uppercase tracking-wider text-slate-400">
-              Access level
+              Permissions
             </dt>
-            <dd class="mt-1 text-sm font-medium text-slate-100">View only</dd>
+            <dd class="mt-1 text-sm font-medium text-slate-100">
+              {{ form.controls.permissions.value.length }} granted
+            </dd>
           </div>
         </dl>
       </section>
@@ -76,10 +80,14 @@
               id="user-creation-title"
               class="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl"
             >
-              Create a user
+              {{ isEditMode ? "Edit user" : "Create a user" }}
             </h2>
             <p class="mt-3 text-sm leading-6 text-slate-600">
-              Add a teammate with the minimum access needed to get started.
+              {{
+                isEditMode
+                  ? "Configure role and permissions for this teammate."
+                  : "Add a teammate and configure their role and permissions."
+              }}
             </p>
           </header>
 
@@ -87,7 +95,7 @@
             class="mt-8 space-y-5"
             [formGroup]="form"
             (ngSubmit)="submit()"
-            aria-label="Create user"
+            [attr.aria-label]="isEditMode ? 'Edit user' : 'Create user'"
           >
             <div>
               <label
@@ -149,7 +157,7 @@
               </p>
             </div>
 
-            <div>
+            <div *ngIf="!isEditMode">
               <label
                 class="block text-sm font-semibold text-slate-800"
                 for="user-password"
@@ -201,6 +209,79 @@
               </p>
             </div>
 
+            <div>
+              <label
+                class="block text-sm font-semibold text-slate-800"
+                for="user-role"
+              >
+                Role
+              </label>
+              <select
+                id="user-role"
+                class="mt-2 block w-full border border-slate-300 bg-white px-3.5 py-3 text-sm text-slate-950 outline-none transition focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20 disabled:cursor-not-allowed disabled:bg-slate-100"
+                formControlName="role"
+                (change)="onRoleChange(form.controls.role.value)"
+                aria-describedby="user-role-help"
+              >
+                <option *ngFor="let option of roleOptions" [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+              <p
+                id="user-role-help"
+                class="mt-2 text-xs leading-5 text-slate-500"
+              >
+                Select the user's role. Changing the role updates default permissions.
+              </p>
+            </div>
+
+            <fieldset class="space-y-3">
+              <legend class="block text-sm font-semibold text-slate-800">
+                Permissions
+              </legend>
+              <p class="text-xs leading-5 text-slate-500">
+                Select the permissions granted to this user.
+              </p>
+              <div
+                class="space-y-3 rounded border border-slate-200 bg-slate-50/60 p-4"
+              >
+                <div
+                  *ngFor="let perm of permissionOptions"
+                  class="flex items-start gap-3"
+                >
+                  <div class="flex h-5 items-center">
+                    <input
+                      [id]="'perm-' + perm.value"
+                      type="checkbox"
+                      class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-600/20 disabled:cursor-not-allowed"
+                      [checked]="isPermissionSelected(perm.value)"
+                      [disabled]="form.disabled"
+                      (change)="togglePermission(perm.value, $event)"
+                    />
+                  </div>
+                  <div class="text-xs leading-5">
+                    <label
+                      [for]="'perm-' + perm.value"
+                      class="cursor-pointer font-medium text-slate-900"
+                    >
+                      {{ perm.label }}
+                    </label>
+                    <p class="text-slate-500">{{ perm.description }}</p>
+                  </div>
+                </div>
+              </div>
+              <p
+                *ngIf="
+                  form.controls.permissions.touched &&
+                  form.controls.permissions.invalid
+                "
+                class="text-sm text-rose-700"
+                role="alert"
+              >
+                At least one permission must be selected.
+              </p>
+            </fieldset>
+
             <ng-container *ngIf="creationState$ | async as state">
               <p
                 *ngIf="state.status === 'loading'"
@@ -212,15 +293,18 @@
                   class="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-indigo-600"
                   aria-hidden="true"
                 ></span>
-                Creating user...
+                {{ isEditMode ? "Saving changes..." : "Creating user..." }}
               </p>
               <p
                 *ngIf="state.status === 'success'"
                 class="border border-emerald-200 bg-emerald-50 px-3.5 py-3 text-sm text-emerald-800"
                 role="status"
               >
-                User created successfully. They can now sign in with this email
-                and password.
+                {{
+                  isEditMode
+                    ? "User updated successfully."
+                    : "User created successfully. They can now sign in with this email and password."
+                }}
               </p>
               <p
                 *ngIf="state.status === 'error'"
@@ -252,7 +336,15 @@
                   class="h-4 w-4 animate-spin rounded-full border-2 border-indigo-200 border-t-white"
                   aria-hidden="true"
                 ></span>
-                {{ form.disabled ? "Creating..." : "Create user" }}
+                {{
+                  form.disabled
+                    ? isEditMode
+                      ? "Saving..."
+                      : "Creating..."
+                    : isEditMode
+                      ? "Save user"
+                      : "Create user"
+                }}
               </button>
             </div>
           </form>
@@ -260,8 +352,8 @@
           <p
             class="mt-8 border-t border-slate-200 pt-5 text-xs leading-5 text-slate-500"
           >
-            Roles and permissions are assigned by the application's
-            authorization rules.
+            Configured roles and permissions are saved directly with the user's
+            profile and enforced across the workspace.
           </p>
         </div>
       </section>
