@@ -9,8 +9,7 @@ import {
   UserCreationState,
 } from '../../features/change-requests/models/change-request.models';
 import { AuthenticationProvider } from './authentication-provider';
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { validateCreateUserInput } from './credential-validation';
 
 @Injectable({
   providedIn: 'root',
@@ -80,27 +79,11 @@ export class UserManagementService implements OnDestroy {
   }
 
   private validate(input: CreateUserInput): UserCreationError | null {
-    const name = input.name.trim();
-    const email = input.email.trim();
-    const password = input.password;
-
-    if (!name || !EMAIL_PATTERN.test(email)) {
+    const message = validateCreateUserInput(input);
+    if (message !== null) {
       return {
         code: 'INVALID_INPUT',
-        message: 'Enter a name and a valid email address.',
-      };
-    }
-
-    if (
-      password.length < 8 ||
-      !/[a-z]/.test(password) ||
-      !/[A-Z]/.test(password) ||
-      !/\d/.test(password)
-    ) {
-      return {
-        code: 'INVALID_INPUT',
-        message:
-          'Password must be at least 8 characters and include uppercase, lowercase, and a number.',
+        message,
       };
     }
 
@@ -108,6 +91,13 @@ export class UserManagementService implements OnDestroy {
   }
 
   private toCreationError(error: unknown): UserCreationError {
+    if (error instanceof Error && error.message === 'INVALID_INPUT') {
+      return {
+        code: 'INVALID_INPUT',
+        message: 'Enter a name, valid email address, and valid password.',
+      };
+    }
+
     if (error instanceof Error && error.message === 'DUPLICATE_EMAIL') {
       return {
         code: 'DUPLICATE_EMAIL',

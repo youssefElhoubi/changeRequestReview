@@ -53,6 +53,42 @@ describe('MockAuthenticationProvider user creation', () => {
     ]);
   });
 
+  it.each([
+    ['alice@example.com', 'u-alice'],
+    ['bob@example.com', 'u-bob'],
+    ['carol@example.com', 'u-carol'],
+  ])(
+    'authenticates seeded user %s with the development password',
+    async (email) => {
+      const result = await provider.login({
+        email,
+        password: 'Dev123!ChangeMe',
+      });
+
+      expect(result.user.email).toBe(email);
+    },
+  );
+
+  it('rejects an incorrect password for a seeded user', async () => {
+    await expect(
+      provider.login({
+        email: 'alice@example.com',
+        password: 'mock-u-alice',
+      }),
+    ).rejects.toThrow('INVALID_CREDENTIALS');
+  });
+
+  it.each([
+    { name: '', email: 'new@example.com', password: 'StrongPass1' },
+    { name: 'New User', email: '', password: 'StrongPass1' },
+    { name: 'New User', email: 'new@example.com', password: '' },
+  ])('rejects incomplete user credentials', async (input) => {
+    await expect(provider.createUser(input)).rejects.toThrow('INVALID_INPUT');
+    expect(
+      storage.getUsers().some((user) => user.email === 'new@example.com'),
+    ).toBe(false);
+  });
+
   it('rejects duplicate emails after normalization', async () => {
     await expect(
       provider.createUser({

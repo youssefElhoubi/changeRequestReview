@@ -9,8 +9,14 @@ import {
   User,
 } from '../../features/change-requests/models/change-request.models';
 import { MockDataStorageService } from '../api/mock-data-storage.service';
+import { MOCK_USER_PASSWORDS } from '../api/mock-data';
 import { AuthenticationProvider } from './authentication-provider';
 import { AuditLogService } from './audit-log.service';
+import {
+  normalizeEmail,
+  validateCreateUserInput,
+  validateLoginCredentials,
+} from './credential-validation';
 
 const MOCK_SESSION_TOKEN_KEY = 'change-request-review.mock-session-token';
 const activeSessions = new Map<string, string>();
@@ -26,6 +32,10 @@ export class MockAuthenticationProvider extends AuthenticationProvider {
   }
 
   async login(credentials: LoginCredentials): Promise<AuthenticationResult> {
+    if (!validateLoginCredentials(credentials)) {
+      throw new Error('INVALID_CREDENTIALS');
+    }
+
     const normalizedEmail = normalizeEmail(credentials.email);
     const user = this.storage
       .getUsers()
@@ -46,6 +56,10 @@ export class MockAuthenticationProvider extends AuthenticationProvider {
   }
 
   async createUser(input: CreateUserInput): Promise<User> {
+    if (validateCreateUserInput(input)) {
+      throw new Error('INVALID_INPUT');
+    }
+
     const email = normalizeEmail(input.email);
     const users = this.storage.getUsers();
     if (
@@ -130,7 +144,7 @@ export class MockAuthenticationProvider extends AuthenticationProvider {
     if (storedDigest) {
       return storedDigest === (await hashPassword(password));
     }
-    return password === `mock-${user.id}`;
+    return MOCK_USER_PASSWORDS[user.id] === password;
   }
 
   private createUserId(): string {
@@ -161,10 +175,6 @@ export class MockAuthenticationProvider extends AuthenticationProvider {
       return 'unknown';
     }
   }
-}
-
-function normalizeEmail(email: string): string {
-  return email.trim().toLowerCase();
 }
 
 async function hashPassword(password: string): Promise<string> {

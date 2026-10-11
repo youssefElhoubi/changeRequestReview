@@ -3,6 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { UserManagementService } from './user-management.service';
+import { MIN_PASSWORD_LENGTH, PASSWORD_PATTERN } from './credential-validation';
 
 @Component({
   selector: 'app-user-creation',
@@ -18,8 +19,8 @@ export class UserCreationComponent {
       '',
       [
         Validators.required,
-        Validators.minLength(8),
-        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/),
+        Validators.minLength(MIN_PASSWORD_LENGTH),
+        Validators.pattern(PASSWORD_PATTERN),
       ],
     ],
   });

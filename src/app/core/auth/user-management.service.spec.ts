@@ -64,6 +64,14 @@ describe('UserManagementService', () => {
     expect(provider.createUser).not.toHaveBeenCalled();
   });
 
+  it('rejects an empty password without calling the provider', async () => {
+    await expect(
+      firstValueFrom(service.createUser({ ...validInput, password: '' })),
+    ).rejects.toMatchObject({ code: 'INVALID_INPUT' });
+
+    expect(provider.createUser).not.toHaveBeenCalled();
+  });
+
   it('prevents duplicate submissions while a request is in progress', async () => {
     let resolveCreation: (user: User) => void = () => undefined;
     provider.createUser.mockReturnValue(

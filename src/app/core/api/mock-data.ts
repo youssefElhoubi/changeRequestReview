@@ -5,6 +5,14 @@ import {
   UserPermission,
 } from '../../features/change-requests/models/change-request.models';
 
+// Development-only credentials for the seeded mock accounts. Never use these
+// credentials or this browser-side storage approach in production.
+export const MOCK_USER_PASSWORDS: Readonly<Record<string, string>> = {
+  'u-alice': 'Dev123!ChangeMe',
+  'u-bob': 'Dev123!ChangeMe',
+  'u-carol': 'Dev123!ChangeMe',
+};
+
 export const MOCK_USERS: User[] = [
   {
     id: 'u-alice',
