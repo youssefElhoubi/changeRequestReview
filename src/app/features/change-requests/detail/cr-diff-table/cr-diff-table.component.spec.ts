@@ -60,4 +60,26 @@ describe('CrDiffTableComponent', () => {
     expect(totals.textContent).toContain('120');
     expect(totals.textContent).toContain('60');
   });
+
+  it('correctly calculates deltas and totals when numeric values are provided as strings', () => {
+    const testFixture = TestBed.createComponent(CrDiffTableComponent);
+    testFixture.componentInstance.changes = [
+      { id: '1', field: 'Amount', before: '100', after: '250' },
+      { id: '2', field: 'Tax', before: null, after: '50' },
+    ];
+    testFixture.detectChanges();
+
+    const rows = testFixture.nativeElement.querySelectorAll(
+      '[data-testid="diff-row"]',
+    );
+    expect(rows[0].textContent).toContain('150');
+    expect(rows[1].textContent).toContain('50');
+
+    const totals = testFixture.nativeElement.querySelector(
+      '[data-testid="diff-totals"]',
+    );
+    expect(totals.textContent).toContain('100');
+    expect(totals.textContent).toContain('300');
+    expect(totals.textContent).toContain('200');
+  });
 });

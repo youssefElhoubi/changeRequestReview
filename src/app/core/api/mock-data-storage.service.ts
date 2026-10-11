@@ -61,9 +61,17 @@ export class MockDataStorageService {
       throw new Error('Mock change request storage was not initialized.');
     }
 
-    const parsed: unknown = JSON.parse(raw);
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      this.saveChangeRequests(MOCK_CHANGE_REQUESTS);
+      return MOCK_CHANGE_REQUESTS.map((request) => this.clone(request));
+    }
+
     if (!Array.isArray(parsed) || !parsed.every(isChangeRequest)) {
-      throw new Error('Mock change request storage contains invalid data.');
+      this.saveChangeRequests(MOCK_CHANGE_REQUESTS);
+      return MOCK_CHANGE_REQUESTS.map((request) => this.clone(request));
     }
 
     return parsed.map((request) => this.clone(request));
@@ -116,12 +124,11 @@ export class MockDataStorageService {
   getCurrentUserId(): string {
     this.initialize();
 
-    const userId = localStorage.getItem(MOCK_CURRENT_USER_ID_STORAGE_KEY);
-    if (
-      userId === null ||
-      this.getUsers().every((user) => user.id !== userId)
-    ) {
-      throw new Error(`Unknown current user: ${userId ?? '(missing)'}`);
+    let userId = localStorage.getItem(MOCK_CURRENT_USER_ID_STORAGE_KEY);
+    const users = this.getUsers();
+    if (userId === null || users.every((user) => user.id !== userId)) {
+      userId = users[0]?.id ?? MOCK_USERS[0].id;
+      localStorage.setItem(MOCK_CURRENT_USER_ID_STORAGE_KEY, userId);
     }
 
     return userId;

@@ -88,4 +88,28 @@ describe('CrActionsComponent', () => {
       reason: '  Not enough evidence  ',
     });
   });
+
+  it('resets validationMessage when approving', () => {
+    fixture.componentInstance.canApprove = true;
+    fixture.componentInstance.canReject = true;
+    fixture.detectChanges();
+
+    // Trigger validation error on reject
+    const reason = fixture.nativeElement.querySelector(
+      '[data-testid="reject-reason"]',
+    ) as HTMLTextAreaElement;
+    reason.value = '';
+    fixture.nativeElement
+      .querySelector('[data-testid="reject-btn"]')
+      .dispatchEvent(new Event('click'));
+    fixture.detectChanges();
+    expect(fixture.componentInstance.validationMessage).toBeTruthy();
+
+    // Now click approve
+    fixture.nativeElement
+      .querySelector('[data-testid="approve-btn"]')
+      .dispatchEvent(new Event('click'));
+    fixture.detectChanges();
+    expect(fixture.componentInstance.validationMessage).toBe('');
+  });
 });

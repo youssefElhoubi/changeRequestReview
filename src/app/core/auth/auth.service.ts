@@ -45,27 +45,58 @@ export class AuthService implements OnDestroy {
   }
 
   get currentUser(): User {
+    if (
+      this.stateSubject.value.status === 'authenticated' &&
+      this.stateSubject.value.user
+    ) {
+      return this.stateSubject.value.user;
+    }
     return this.storage.getUserById(this.currentUserIdValue);
   }
 
   get currentUserIdValue(): string {
+    if (
+      this.stateSubject.value.status === 'authenticated' &&
+      this.stateSubject.value.user
+    ) {
+      return this.stateSubject.value.user.id;
+    }
     return this.storage.getCurrentUserId();
   }
 
   hasPermission(permission: UserPermission): boolean {
+    if (this.stateSubject.value.status === 'unauthenticated') {
+      return false;
+    }
+    if (
+      this.stateSubject.value.status === 'authenticated' &&
+      this.stateSubject.value.user
+    ) {
+      return this.stateSubject.value.user.permissions.includes(permission);
+    }
     return this.currentUser.permissions.includes(permission);
   }
 
   hasRole(role: UserRole): boolean {
+    if (this.stateSubject.value.status === 'unauthenticated') {
+      return false;
+    }
+    if (
+      this.stateSubject.value.status === 'authenticated' &&
+      this.stateSubject.value.user
+    ) {
+      return this.stateSubject.value.user.role === role;
+    }
     return this.currentUser.role === role;
   }
 
   setCurrentUser(userId: string): void {
     this.operationVersion += 1;
     this.storage.setCurrentUserId(userId);
+    const user = this.storage.getUserById(userId);
     this.stateSubject.next({
-      status: 'unauthenticated',
-      user: null,
+      status: 'authenticated',
+      user,
       error: null,
     });
   }

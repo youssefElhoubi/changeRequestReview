@@ -110,7 +110,7 @@ export class MockBackendInterceptor implements HttpInterceptor {
       id,
       title: parsed.title,
       description: parsed.description,
-      status: ChangeRequestStatus.Draft,
+      status: ChangeRequestStatus.PendingReview,
       createdBy: { id: currentUser.id, name: currentUser.name },
       createdAt: now,
       changeCount: parsed.changes.length,
@@ -124,6 +124,12 @@ export class MockBackendInterceptor implements HttpInterceptor {
         {
           id: `${id}-created`,
           type: 'created',
+          actor: { id: currentUser.id, name: currentUser.name },
+          at: now,
+        },
+        {
+          id: `${id}-submitted`,
+          type: 'submitted',
           actor: { id: currentUser.id, name: currentUser.name },
           at: now,
         },

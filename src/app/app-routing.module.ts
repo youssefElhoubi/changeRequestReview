@@ -18,6 +18,7 @@ const routes: Routes = [
   {
     path: 'change-requests',
     canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     data: { permission: UserPermission.ViewChangeRequests },
     loadChildren: () =>
       import('./features/change-requests/change-requests.module').then(

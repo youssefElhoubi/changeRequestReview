@@ -116,6 +116,7 @@ export class MockAuthenticationProvider extends AuthenticationProvider {
       return null;
     }
 
+    this.storage.setCurrentUserId(user.id);
     return { user, sessionToken: token };
   }
 

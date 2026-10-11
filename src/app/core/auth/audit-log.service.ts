@@ -28,9 +28,17 @@ export class AuditLogService {
       return [];
     }
 
-    const parsed: unknown = JSON.parse(raw);
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      this.clear();
+      return [];
+    }
+
     if (!Array.isArray(parsed) || !parsed.every(isAuditLog)) {
-      throw new Error('Audit log storage contains invalid data.');
+      this.clear();
+      return [];
     }
 
     return parsed.map((log) => ({ ...log }));

@@ -35,15 +35,18 @@ export class CrDiffTableComponent {
   }
 
   delta(change: ChangeEntry): number | null {
+    const beforeNum = this.toNumericOrNull(change.before);
+    const afterNum = this.toNumericOrNull(change.after);
+
     if (
-      !this.isNumericOrNull(change.before) ||
-      !this.isNumericOrNull(change.after) ||
-      (change.before === null && change.after === null)
+      beforeNum === undefined ||
+      afterNum === undefined ||
+      (beforeNum === null && afterNum === null)
     ) {
       return null;
     }
 
-    return Number(((change.after ?? 0) - (change.before ?? 0)).toFixed(2));
+    return Number(((afterNum ?? 0) - (beforeNum ?? 0)).toFixed(2));
   }
 
   display(value: ChangeEntry['before']): string {
@@ -58,16 +61,29 @@ export class CrDiffTableComponent {
     return Number(
       this.changes
         .reduce((total, change) => {
-          const currentValue = value(change);
-          return total + (typeof currentValue === 'number' ? currentValue : 0);
+          const num = this.toNumericOrNull(value(change));
+          return total + (typeof num === 'number' ? num : 0);
         }, 0)
         .toFixed(2),
     );
   }
 
-  private isNumericOrNull(
+  private toNumericOrNull(
     value: ChangeEntry['before'],
-  ): value is number | null {
-    return value === null || typeof value === 'number';
+  ): number | null | undefined {
+    if (value === null) {
+      return null;
+    }
+    if (typeof value === 'number' && !isNaN(value)) {
+      return value;
+    }
+    if (
+      typeof value === 'string' &&
+      value.trim() !== '' &&
+      !isNaN(Number(value))
+    ) {
+      return Number(value);
+    }
+    return undefined;
   }
 }

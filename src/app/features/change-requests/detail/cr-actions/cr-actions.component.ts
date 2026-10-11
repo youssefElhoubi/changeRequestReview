@@ -29,6 +29,7 @@ export class CrActionsComponent {
 
   onApprove(): void {
     if (this.changeRequest && this.canApprove && !this.actionInFlight) {
+      this.validationMessage = '';
       this.approve.emit(this.changeRequest);
     }
   }

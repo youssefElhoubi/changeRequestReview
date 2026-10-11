@@ -129,4 +129,19 @@ describe('MockDataStorageService user compatibility', () => {
       ]),
     );
   });
+
+  it('recovers from invalid or corrupted change request storage', () => {
+    localStorage.setItem('change_requests', 'invalid-json{{{');
+    const requests = storage.getChangeRequests();
+    expect(requests.length).toBeGreaterThan(0);
+
+    localStorage.setItem('change_requests', JSON.stringify([{ bad: 'data' }]));
+    const requestsRecovered = storage.getChangeRequests();
+    expect(requestsRecovered.length).toBeGreaterThan(0);
+  });
+
+  it('falls back to the first user when stored current user id is missing or unknown', () => {
+    localStorage.setItem(MOCK_CURRENT_USER_ID_STORAGE_KEY, 'u-nonexistent');
+    expect(storage.getCurrentUserId()).toBe('u-alice');
+  });
 });

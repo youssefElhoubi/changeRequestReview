@@ -22,7 +22,12 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     data: { permission: UserPermission.CreateChangeRequests },
   },
-  { path: ':id', component: CrDetailComponent },
+  {
+    path: ':id',
+    component: CrDetailComponent,
+    canActivate: [AuthGuard],
+    data: { permission: UserPermission.ViewChangeRequests },
+  },
 ];
 
 @NgModule({

@@ -109,4 +109,22 @@ describe('AuthGuard', () => {
 
     expect(router.createUrlTree).toHaveBeenCalledWith(['/forbidden']);
   });
+
+  it('delegates canActivateChild to canActivate', async () => {
+    const authState$ = new BehaviorSubject<AuthenticationState>({
+      status: 'authenticated',
+      user,
+      error: null,
+    });
+    const { guard } = createGuard(authState$);
+
+    expect(
+      await firstValueFrom(
+        guard.canActivateChild(
+          route({ permission: UserPermission.ViewChangeRequests }),
+          state('/change-requests/cr-1001'),
+        ),
+      ),
+    ).toBe(true);
+  });
 });

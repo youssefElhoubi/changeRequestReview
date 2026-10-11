@@ -100,4 +100,22 @@ describe('ChangeRequestService status updates', () => {
         ?.status,
     ).toBe(ChangeRequestStatus.PendingReview);
   }));
+
+  it('creates a change request with PendingReview status and submitted timeline event', fakeAsync(() => {
+    storage.setCurrentUserId('u-dave');
+
+    const created = resolve(
+      service.create({
+        title: 'New Policy',
+        description: 'New policy details',
+        changes: [{ field: 'Retention', before: 30, after: 60 }],
+      }),
+    );
+
+    expect(created.status).toBe(ChangeRequestStatus.PendingReview);
+    expect(created.timeline.map((event) => event.type)).toEqual([
+      'created',
+      'submitted',
+    ]);
+  }));
 });

@@ -7,6 +7,7 @@ import { MockDataStorageService } from '../api/mock-data-storage.service';
 import {
   AuthenticationResult,
   User,
+  UserPermission,
 } from '../../features/change-requests/models/change-request.models';
 
 describe('AuthService', () => {
@@ -112,5 +113,38 @@ describe('AuthService', () => {
       status: 'authenticated',
       user: alice,
     });
+  });
+
+  it('updates the authenticated state and current user when setCurrentUser is called', async () => {
+    service = TestBed.inject(AuthService);
+
+    service.setCurrentUser('u-bob');
+
+    const state = await firstValueFrom(service.state$);
+    expect(state.status).toBe('authenticated');
+    expect(state.user?.id).toBe('u-bob');
+    expect(service.currentUserIdValue).toBe('u-bob');
+    expect(service.hasRole('approver')).toBe(true);
+    expect(service.hasPermission(UserPermission.ApproveChangeRequests)).toBe(
+      true,
+    );
+  });
+
+  it('returns false for hasRole and hasPermission when unauthenticated', async () => {
+    provider.login.mockResolvedValue({
+      user: alice,
+      sessionToken: 'session-token',
+    });
+    service = TestBed.inject(AuthService);
+    await firstValueFrom(
+      service.login({ email: aliceEmail, password: 'secret' }),
+    );
+
+    service.logout();
+
+    expect(service.hasRole('approver')).toBe(false);
+    expect(service.hasPermission(UserPermission.ViewChangeRequests)).toBe(
+      false,
+    );
   });
 });
