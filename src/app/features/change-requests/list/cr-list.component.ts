@@ -3,9 +3,11 @@ import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { catchError, map, startWith, tap } from 'rxjs/operators';
 
+import { AuthService } from '../../../core/auth/auth.service';
 import {
   ChangeRequestStatus,
   ChangeRequestSummary,
+  UserPermission,
 } from '../models/change-request.models';
 import { ChangeRequestService } from '../data/change-request.service';
 
@@ -24,6 +26,12 @@ interface CrListViewModel {
 })
 export class CrListComponent implements OnInit {
   readonly statuses = Object.values(ChangeRequestStatus);
+  readonly pendingReviewStatus = ChangeRequestStatus.PendingReview;
+  readonly approvedStatus = ChangeRequestStatus.Approved;
+  readonly rejectedStatus = ChangeRequestStatus.Rejected;
+  readonly authState$ = this.authService.state$;
+  readonly viewPermission = UserPermission.ViewChangeRequests;
+  readonly createPermission = UserPermission.CreateChangeRequests;
   statusFilter = '';
   rows: ChangeRequestSummary[] = [];
   visibleRows: ChangeRequestSummary[] = [];
@@ -36,6 +44,7 @@ export class CrListComponent implements OnInit {
   constructor(
     private readonly changeRequestService: ChangeRequestService,
     private readonly router: Router,
+    private readonly authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -86,5 +95,25 @@ export class CrListComponent implements OnInit {
 
   formatStatus(status: ChangeRequestStatus): string {
     return status.replace('_', ' ');
+  }
+
+  get recentRows(): ChangeRequestSummary[] {
+    return [...this.visibleRows].sort(
+      (left, right) =>
+        new Date(right.createdAt).getTime() -
+        new Date(left.createdAt).getTime(),
+    );
+  }
+
+  countByStatus(status: ChangeRequestStatus): number {
+    return this.rows.filter((row) => row.status === status).length;
+  }
+
+  hasCreatePermission(permissions: UserPermission[]): boolean {
+    return permissions.includes(this.createPermission);
+  }
+
+  canCreateUsers(role: string): boolean {
+    return role === 'approver';
   }
 }

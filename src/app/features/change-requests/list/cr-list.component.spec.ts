@@ -3,9 +3,11 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { Observable, of, throwError } from 'rxjs';
 
 import { ChangeRequestService } from '../data/change-request.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import {
   ChangeRequestStatus,
   ChangeRequestSummary,
+  UserPermission,
 } from '../models/change-request.models';
 import { CrListComponent } from './cr-list.component';
 import { CrTableComponent } from './cr-table.component';
@@ -38,7 +40,25 @@ describe('CrListComponent', () => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
       declarations: [CrListComponent, CrTableComponent],
-      providers: [{ provide: ChangeRequestService, useValue: service }],
+      providers: [
+        { provide: ChangeRequestService, useValue: service },
+        {
+          provide: AuthService,
+          useValue: {
+            state$: of({
+              status: 'authenticated',
+              user: {
+                id: 'u-viewer',
+                name: 'Viewer',
+                passeord: 'Dev123!ChangeMe',
+                role: 'viewer',
+                permissions: [UserPermission.ViewChangeRequests],
+              },
+              error: null,
+            }),
+          },
+        },
+      ],
     });
     fixture = TestBed.createComponent(CrListComponent);
     fixture.detectChanges();
