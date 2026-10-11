@@ -57,7 +57,13 @@ describe('UserCreationComponent', () => {
     fixture.componentInstance.submit();
     creationState$.next({
       status: 'success',
-      user: { id: 'u-new', name: 'New User', role: 'viewer', permissions: [] },
+      user: {
+        id: 'u-new',
+        name: 'New User',
+        passeord: 'StrongPass1',
+        role: 'viewer',
+        permissions: [],
+      },
       error: null,
     });
     fixture.detectChanges();

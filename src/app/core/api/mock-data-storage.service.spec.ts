@@ -24,6 +24,7 @@ describe('MockDataStorageService user compatibility', () => {
         {
           id: 'u-legacy',
           name: 'Legacy User',
+          passeord: '',
           role: 'viewer',
           permissions: [UserPermission.ViewChangeRequests],
         },
@@ -35,6 +36,7 @@ describe('MockDataStorageService user compatibility', () => {
       {
         id: 'u-legacy',
         name: 'Legacy User',
+        passeord: '',
         role: 'viewer',
         permissions: [UserPermission.ViewChangeRequests],
       },
@@ -48,12 +50,41 @@ describe('MockDataStorageService user compatibility', () => {
         id: 'u-email',
         name: 'Email User',
         email: 'email@example.com',
+        passeord: 'Dev123!ChangeMe',
         role: 'viewer',
         permissions: [UserPermission.ViewChangeRequests],
       },
     ]);
 
     expect(storage.getUsers()[0].email).toBe('email@example.com');
+  });
+
+  it('loads created users from storage in a new service instance', () => {
+    storage.saveUsers([
+      {
+        id: 'u-created',
+        name: 'Created User',
+        email: 'created@example.com',
+        passeord: 'StrongPass1',
+        role: 'viewer',
+        permissions: [UserPermission.ViewChangeRequests],
+      },
+    ]);
+    localStorage.removeItem(MOCK_CURRENT_USER_ID_STORAGE_KEY);
+
+    const reloadedStorage = new MockDataStorageService();
+
+    expect(reloadedStorage.getUsers()).toEqual([
+      {
+        id: 'u-created',
+        name: 'Created User',
+        email: 'created@example.com',
+        passeord: 'StrongPass1',
+        role: 'viewer',
+        permissions: [UserPermission.ViewChangeRequests],
+      },
+    ]);
+    expect(reloadedStorage.getCurrentUserId()).toBe('u-created');
   });
 
   it('migrates a known legacy mock user with its seed email', () => {
@@ -63,6 +94,7 @@ describe('MockDataStorageService user compatibility', () => {
         {
           id: 'u-alice',
           name: 'Alice',
+          passeord: '',
           role: 'approver',
           permissions: [
             'view_change_requests',
@@ -76,7 +108,7 @@ describe('MockDataStorageService user compatibility', () => {
     expect(storage.getUsers()[0].email).toBe('alice@example.com');
   });
 
-  it('rejects persisted users with an invalid email value', () => {
+  it('recovers from persisted users with invalid data', () => {
     localStorage.setItem(
       MOCK_USERS_STORAGE_KEY,
       JSON.stringify([
@@ -84,14 +116,17 @@ describe('MockDataStorageService user compatibility', () => {
           id: 'u-invalid',
           name: 'Invalid User',
           email: 123,
+          passeord: '',
           role: 'viewer',
           permissions: [UserPermission.ViewChangeRequests],
         },
       ]),
     );
 
-    expect(() => storage.getUsers()).toThrow(
-      'Mock user storage contains invalid data.',
+    expect(storage.getUsers()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'u-alice', passeord: 'Dev123!ChangeMe' }),
+      ]),
     );
   });
 });

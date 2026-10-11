@@ -1,172 +1,215 @@
 <main
-  class="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:flex lg:items-center lg:justify-center lg:py-12"
+  class="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10 lg:flex lg:items-center lg:justify-center"
   aria-live="polite"
 >
-  <div
-    class="grid w-full max-w-5xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60 lg:grid-cols-[0.9fr_1.1fr]"
-  >
-    <section
-      class="hidden bg-indigo-950 p-10 text-white lg:flex lg:flex-col lg:justify-between"
+  <div class="w-full max-w-6xl">
+    <div class="mb-6 flex items-center justify-between px-1 sm:mb-8 sm:px-2">
+      <a
+        routerLink="/login"
+        class="flex items-center gap-3 text-sm font-semibold tracking-tight text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-4"
+      >
+        <span
+          class="flex h-9 w-9 items-center justify-center rounded-md bg-indigo-700 text-xs font-bold tracking-widest text-white"
+          aria-hidden="true"
+          >CR</span
+        >
+        <span>Change request review</span>
+      </a>
+      <span
+        class="hidden text-xs font-medium uppercase tracking-widest text-slate-400 sm:block"
+        >Secure workspace</span
+      >
+    </div>
+
+    <div
+      class="grid overflow-hidden border border-slate-200 bg-white shadow-lg shadow-slate-200/50 lg:grid-cols-[0.85fr_1.15fr]"
     >
-      <div>
-        <div class="flex items-center gap-3">
-          <span
-            class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-400/20 text-sm font-bold tracking-wider text-indigo-200"
-            >CR</span
+      <section
+        class="bg-slate-900 px-6 py-8 text-white sm:px-10 sm:py-10 lg:flex lg:min-h-[560px] lg:flex-col lg:justify-between lg:px-12 lg:py-12"
+        aria-labelledby="login-introduction"
+      >
+        <div>
+          <p
+            class="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-300"
           >
-          <span class="text-sm font-semibold tracking-wide text-indigo-100"
-            >Change request review</span
+            Review with confidence
+          </p>
+          <h1
+            id="login-introduction"
+            class="mt-6 max-w-md text-3xl font-semibold leading-tight tracking-tight sm:text-4xl"
           >
-        </div>
-        <h1
-          class="mt-16 max-w-sm text-4xl font-semibold leading-tight tracking-tight"
-        >
-          Make every change easier to review.
-        </h1>
-        <p class="mt-5 max-w-sm text-sm leading-6 text-indigo-200">
-          Review proposed changes, understand their history, and make decisions
-          with confidence.
-        </p>
-      </div>
-      <p class="text-xs text-indigo-300">
-        A focused workspace for thoughtful approvals.
-      </p>
-    </section>
-
-    <section class="p-6 sm:p-10">
-      <div class="mx-auto max-w-md">
-        <div class="lg:hidden">
-          <p class="text-sm font-semibold tracking-wide text-indigo-700">
-            Change request review
+            A clearer way to make careful decisions.
+          </h1>
+          <p class="mt-5 max-w-sm text-sm leading-7 text-slate-300">
+            See what changed, follow the approval history, and keep every
+            decision connected to the work behind it.
           </p>
         </div>
-        <header class="mt-2">
-          <p class="text-sm font-medium text-slate-500">Welcome back</p>
-          <h2 class="mt-1 text-3xl font-semibold tracking-tight text-slate-950">
-            Sign in to your workspace
-          </h2>
-          <p class="mt-3 text-sm leading-6 text-slate-600">
-            Use your work email and password to continue.
-          </p>
-        </header>
 
-        <form
-          class="mt-8 space-y-5"
-          [formGroup]="form"
-          (ngSubmit)="submit()"
-          aria-label="Sign in"
+        <dl
+          class="mt-10 grid max-w-sm grid-cols-2 gap-6 border-t border-slate-700 pt-6 lg:mt-0"
         >
           <div>
-            <label
-              class="block text-sm font-medium text-slate-800"
-              for="login-email"
-            >
-              Email address
-            </label>
-            <input
-              id="login-email"
-              class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20 disabled:cursor-not-allowed disabled:bg-slate-100"
-              [class.border-rose-500]="
-                form.controls.email.touched && form.controls.email.invalid
-              "
-              formControlName="email"
-              type="email"
-              autocomplete="email"
-              autocapitalize="none"
-              spellcheck="false"
-              aria-describedby="login-email-error"
-            />
-            <p
-              *ngIf="form.controls.email.touched && form.controls.email.invalid"
-              id="login-email-error"
-              class="mt-2 text-sm text-rose-700"
-              role="alert"
-            >
-              Enter a valid email address.
-            </p>
+            <dt class="text-xs uppercase tracking-wider text-slate-400">
+              Workspace
+            </dt>
+            <dd class="mt-1 text-sm font-medium text-slate-100">
+              Change governance
+            </dd>
           </div>
-
           <div>
-            <div class="flex items-center justify-between">
+            <dt class="text-xs uppercase tracking-wider text-slate-400">
+              Access
+            </dt>
+            <dd class="mt-1 text-sm font-medium text-slate-100">Role-aware</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section
+        class="px-6 py-8 sm:px-10 sm:py-12 lg:flex lg:min-h-[560px] lg:items-center lg:px-16"
+        aria-labelledby="login-title"
+      >
+        <div class="w-full max-w-md">
+          <header>
+            <p class="text-sm font-medium text-indigo-700">Welcome back</p>
+            <h2
+              id="login-title"
+              class="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl"
+            >
+              Sign in to your workspace
+            </h2>
+            <p class="mt-3 text-sm leading-6 text-slate-600">
+              Use your work email and password to continue.
+            </p>
+          </header>
+
+          <form
+            class="mt-8 space-y-5"
+            [formGroup]="form"
+            (ngSubmit)="submit()"
+            aria-label="Sign in"
+          >
+            <div>
               <label
-                class="block text-sm font-medium text-slate-800"
+                class="block text-sm font-semibold text-slate-800"
+                for="login-email"
+              >
+                Email address
+              </label>
+              <input
+                id="login-email"
+                class="mt-2 block w-full border border-slate-300 bg-white px-3.5 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20 disabled:cursor-not-allowed disabled:bg-slate-100"
+                [class.border-rose-500]="
+                  form.controls.email.touched && form.controls.email.invalid
+                "
+                formControlName="email"
+                type="email"
+                autocomplete="email"
+                autocapitalize="none"
+                spellcheck="false"
+                aria-describedby="login-email-error"
+              />
+              <p
+                *ngIf="
+                  form.controls.email.touched && form.controls.email.invalid
+                "
+                id="login-email-error"
+                class="mt-2 text-sm text-rose-700"
+                role="alert"
+              >
+                Enter a valid email address.
+              </p>
+            </div>
+
+            <div>
+              <label
+                class="block text-sm font-semibold text-slate-800"
                 for="login-password"
               >
                 Password
               </label>
-            </div>
-            <div class="relative mt-2">
-              <input
-                id="login-password"
-                class="block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 pr-20 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20 disabled:cursor-not-allowed disabled:bg-slate-100"
-                [class.border-rose-500]="
+              <div class="relative mt-2">
+                <input
+                  id="login-password"
+                  class="block w-full border border-slate-300 bg-white px-3.5 py-3 pr-20 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20 disabled:cursor-not-allowed disabled:bg-slate-100"
+                  [class.border-rose-500]="
+                    form.controls.password.touched &&
+                    form.controls.password.invalid
+                  "
+                  formControlName="password"
+                  [type]="showPassword ? 'text' : 'password'"
+                  autocomplete="current-password"
+                  aria-describedby="login-password-error"
+                />
+                <button
+                  type="button"
+                  class="absolute inset-y-0 right-0 px-3.5 text-xs font-semibold text-slate-600 underline-offset-2 hover:text-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-600 disabled:cursor-not-allowed disabled:text-slate-400"
+                  [disabled]="form.disabled"
+                  [attr.aria-label]="
+                    showPassword ? 'Hide password' : 'Show password'
+                  "
+                  (click)="togglePasswordVisibility()"
+                >
+                  {{ showPassword ? "Hide" : "Show" }}
+                </button>
+              </div>
+              <p
+                *ngIf="
                   form.controls.password.touched &&
                   form.controls.password.invalid
                 "
-                formControlName="password"
-                [type]="showPassword ? 'text' : 'password'"
-                autocomplete="current-password"
-                aria-describedby="login-password-error"
-              />
-              <button
-                type="button"
-                class="absolute inset-y-0 right-0 px-3.5 text-xs font-semibold text-slate-600 underline-offset-2 hover:text-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-600 disabled:cursor-not-allowed disabled:text-slate-400"
-                [disabled]="form.disabled"
-                [attr.aria-label]="
-                  showPassword ? 'Hide password' : 'Show password'
-                "
-                (click)="togglePasswordVisibility()"
+                id="login-password-error"
+                class="mt-2 text-sm text-rose-700"
+                role="alert"
               >
-                {{ showPassword ? "Hide" : "Show" }}
-              </button>
+                Password is required.
+              </p>
             </div>
-            <p
-              *ngIf="
-                form.controls.password.touched && form.controls.password.invalid
-              "
-              id="login-password-error"
-              class="mt-2 text-sm text-rose-700"
-              role="alert"
-            >
-              Password is required.
-            </p>
-          </div>
 
-          <ng-container *ngIf="authState$ | async as state">
-            <p
-              *ngIf="state.status === 'loading'"
-              class="flex items-center gap-2 text-sm text-slate-600"
-              aria-busy="true"
-              role="status"
+            <ng-container *ngIf="authState$ | async as state">
+              <p
+                *ngIf="state.status === 'loading'"
+                class="flex items-center gap-2 text-sm text-slate-600"
+                aria-busy="true"
+                role="status"
+              >
+                <span
+                  class="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-indigo-600"
+                  aria-hidden="true"
+                ></span>
+                Signing you in...
+              </p>
+              <p
+                *ngIf="state.status === 'error'"
+                class="border border-rose-200 bg-rose-50 px-3.5 py-3 text-sm text-rose-800"
+                role="alert"
+              >
+                {{ state.error?.message }}
+              </p>
+            </ng-container>
+
+            <button
+              type="submit"
+              class="flex w-full items-center justify-center gap-2 bg-indigo-700 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-indigo-300"
+              [disabled]="form.disabled"
             >
               <span
-                class="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-indigo-600"
+                *ngIf="form.disabled"
+                class="h-4 w-4 animate-spin rounded-full border-2 border-indigo-200 border-t-white"
+                aria-hidden="true"
               ></span>
-              Signing you in...
-            </p>
-            <p
-              *ngIf="state.status === 'error'"
-              class="rounded-lg border border-rose-200 bg-rose-50 px-3.5 py-3 text-sm text-rose-800"
-              role="alert"
-            >
-              {{ state.error?.message }}
-            </p>
-          </ng-container>
+              {{ form.disabled ? "Signing in..." : "Sign in" }}
+            </button>
+          </form>
 
-          <button
-            type="submit"
-            class="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-indigo-300"
-            [disabled]="form.disabled"
+          <p
+            class="mt-8 border-t border-slate-200 pt-5 text-xs leading-5 text-slate-500"
           >
-            <span
-              *ngIf="form.disabled"
-              class="h-4 w-4 animate-spin rounded-full border-2 border-indigo-200 border-t-white"
-              aria-hidden="true"
-            ></span>
-            {{ form.disabled ? "Signing in..." : "Sign in" }}
-          </button>
-        </form>
-      </div>
-    </section>
+            Access is managed by your workspace role and permissions.
+          </p>
+        </div>
+      </section>
+    </div>
   </div>
 </main>

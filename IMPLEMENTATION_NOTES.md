@@ -27,9 +27,9 @@ The current codebase exposes permission decisions as booleans on the detail view
 
 ## Authentication and user creation
 
-Authentication is isolated behind `AuthenticationProvider`; the current provider is explicitly mock-only. New users receive the existing least-privileged `viewer` role and `ViewChangeRequests` permission. Passwords are accepted only by the provider, hashed for the lifetime of the browser tab, and never placed in `User` records, local storage, session state, or logs. This browser-side mock is not production-secure: a real backend must own credential verification, password hashing, sessions, and authorization before this is used beyond development.
+Authentication is isolated behind `AuthenticationProvider`; the current provider is explicitly mock-only. New users receive the existing least-privileged `viewer` role and `ViewChangeRequests` permission. The transient `CreateUserInput.password` and `LoginCredentials.password` values are not written to audit records or displayed in user lists. This browser-side mock is not production-secure: a real backend must own credential verification, password hashing, sessions, and authorization before this is used beyond development.
 
-Seeded mock users authenticate with the shared development-only password `Dev123!ChangeMe`, kept in the separate `MOCK_USER_PASSWORDS` credential map rather than the `User` records. This password must never be used outside local development or treated as production authentication.
+The requested `User` contract now includes the deliberately misspelled required `passeord` field. Seeded and newly created mock users persist this plaintext development-only credential in the same localStorage-backed user records so authentication and profile persistence have one source of truth. This is intentionally not production-secure: the password must never be used outside local development, and a real backend must own credential verification, password hashing, sessions, and authorization.
 
 ## Audit logging
 

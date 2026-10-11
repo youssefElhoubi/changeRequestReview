@@ -29,10 +29,27 @@ export class MockDataStorageService {
     if (localStorage.getItem(MOCK_USERS_STORAGE_KEY) === null) {
       this.saveUsers(MOCK_USERS);
     } else {
-      this.migrateUserEmails();
+      this.migrateUsers();
     }
     if (localStorage.getItem(MOCK_CURRENT_USER_ID_STORAGE_KEY) === null) {
-      localStorage.setItem(MOCK_CURRENT_USER_ID_STORAGE_KEY, MOCK_USERS[0].id);
+      const rawUsers = localStorage.getItem(MOCK_USERS_STORAGE_KEY);
+      let initialUserId = MOCK_USERS[0].id;
+      if (rawUsers !== null) {
+        try {
+          const parsed: unknown = JSON.parse(rawUsers);
+          if (
+            Array.isArray(parsed) &&
+            parsed.length > 0 &&
+            isRecord(parsed[0]) &&
+            typeof parsed[0]['id'] === 'string'
+          ) {
+            initialUserId = parsed[0]['id'];
+          }
+        } catch {
+          initialUserId = MOCK_USERS[0].id;
+        }
+      }
+      localStorage.setItem(MOCK_CURRENT_USER_ID_STORAGE_KEY, initialUserId);
     }
   }
 
@@ -73,9 +90,17 @@ export class MockDataStorageService {
       throw new Error('Mock user storage was not initialized.');
     }
 
-    const parsed: unknown = JSON.parse(raw);
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      this.saveUsers(MOCK_USERS);
+      return MOCK_USERS.map((user) => this.clone(user));
+    }
+
     if (!Array.isArray(parsed) || !parsed.every(isUser)) {
-      throw new Error('Mock user storage contains invalid data.');
+      this.saveUsers(MOCK_USERS);
+      return MOCK_USERS.map((user) => this.clone(user));
     }
 
     return parsed.map((user) => this.clone(user));
@@ -123,14 +148,21 @@ export class MockDataStorageService {
     return JSON.parse(JSON.stringify(value)) as T;
   }
 
-  private migrateUserEmails(): void {
+  private migrateUsers(): void {
     const raw = localStorage.getItem(MOCK_USERS_STORAGE_KEY);
     if (raw === null) {
       return;
     }
 
-    const parsed: unknown = JSON.parse(raw);
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      this.saveUsers(MOCK_USERS);
+      return;
+    }
     if (!Array.isArray(parsed)) {
+      this.saveUsers(MOCK_USERS);
       return;
     }
 
@@ -139,9 +171,15 @@ export class MockDataStorageService {
         return value;
       }
       const seed = MOCK_USERS.find((user) => user.id === value['id']);
-      return seed && value['email'] === undefined
-        ? { ...value, email: seed.email }
-        : value;
+      return {
+        ...value,
+        email:
+          value['email'] === undefined && seed ? seed.email : value['email'],
+        passeord:
+          value['passeord'] === undefined
+            ? (seed?.passeord ?? '')
+            : value['passeord'],
+      };
     });
 
     if (JSON.stringify(migrated) !== raw) {
@@ -179,6 +217,7 @@ function isUser(value: unknown): value is User {
     typeof value['id'] === 'string' &&
     typeof value['name'] === 'string' &&
     (value['email'] === undefined || typeof value['email'] === 'string') &&
+    typeof value['passeord'] === 'string' &&
     isUserRole(value['role']) &&
     Array.isArray(value['permissions']) &&
     value['permissions'].every(isUserPermission)

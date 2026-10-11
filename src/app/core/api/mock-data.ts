@@ -5,19 +5,16 @@ import {
   UserPermission,
 } from '../../features/change-requests/models/change-request.models';
 
-// Development-only credentials for the seeded mock accounts. Never use these
-// credentials or this browser-side storage approach in production.
-export const MOCK_USER_PASSWORDS: Readonly<Record<string, string>> = {
-  'u-alice': 'Dev123!ChangeMe',
-  'u-bob': 'Dev123!ChangeMe',
-  'u-carol': 'Dev123!ChangeMe',
-};
+// Development-only credentials persisted in the mock user records. Never use
+// this plaintext browser-side approach in production.
+const DEVELOPMENT_PASSWORD = 'Dev123!ChangeMe';
 
 export const MOCK_USERS: User[] = [
   {
     id: 'u-alice',
     name: 'Alice',
     email: 'alice@example.com',
+    passeord: DEVELOPMENT_PASSWORD,
     role: 'approver',
     permissions: [
       UserPermission.ViewChangeRequests,
@@ -29,6 +26,7 @@ export const MOCK_USERS: User[] = [
     id: 'u-bob',
     name: 'Bob',
     email: 'bob@example.com',
+    passeord: DEVELOPMENT_PASSWORD,
     role: 'approver',
     permissions: [
       UserPermission.ViewChangeRequests,
@@ -40,6 +38,7 @@ export const MOCK_USERS: User[] = [
     id: 'u-carol',
     name: 'Carol',
     email: 'carol@example.com',
+    passeord: DEVELOPMENT_PASSWORD,
     role: 'viewer',
     permissions: [UserPermission.ViewChangeRequests],
   },

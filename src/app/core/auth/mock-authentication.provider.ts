@@ -9,7 +9,6 @@ import {
   User,
 } from '../../features/change-requests/models/change-request.models';
 import { MockDataStorageService } from '../api/mock-data-storage.service';
-import { MOCK_USER_PASSWORDS } from '../api/mock-data';
 import { AuthenticationProvider } from './authentication-provider';
 import { AuditLogService } from './audit-log.service';
 import {
@@ -19,8 +18,7 @@ import {
 } from './credential-validation';
 
 const MOCK_SESSION_TOKEN_KEY = 'change-request-review.mock-session-token';
-const activeSessions = new Map<string, string>();
-const passwordDigests = new Map<string, string>();
+const MOCK_SESSION_USER_ID_KEY = 'change-request-review.mock-session-user-id';
 
 @Injectable()
 export class MockAuthenticationProvider extends AuthenticationProvider {
@@ -79,12 +77,12 @@ export class MockAuthenticationProvider extends AuthenticationProvider {
       id: this.createUserId(),
       name: input.name.trim(),
       email,
+      passeord: input.password,
       role: DEFAULT_NEW_USER_ROLE,
       permissions: [...DEFAULT_NEW_USER_PERMISSIONS],
     };
     this.storage.saveUsers([...users, user]);
     try {
-      passwordDigests.set(email, await hashPassword(input.password));
       this.auditLog.record({
         actorUserId: this.getActorUserId(),
         action: 'user.created',
@@ -94,7 +92,6 @@ export class MockAuthenticationProvider extends AuthenticationProvider {
         changedFields: ['name', 'email', 'role', 'permissions'],
       });
     } catch (error) {
-      passwordDigests.delete(email);
       this.storage.saveUsers(users);
       throw error;
     }
@@ -103,32 +100,36 @@ export class MockAuthenticationProvider extends AuthenticationProvider {
 
   async restore(): Promise<AuthenticationResult | null> {
     const token = sessionStorage.getItem(MOCK_SESSION_TOKEN_KEY);
-    if (!token) {
-      return null;
-    }
-
-    const userId = activeSessions.get(token);
-    if (!userId) {
+    const userId = sessionStorage.getItem(MOCK_SESSION_USER_ID_KEY);
+    if (!token || !userId) {
       sessionStorage.removeItem(MOCK_SESSION_TOKEN_KEY);
+      sessionStorage.removeItem(MOCK_SESSION_USER_ID_KEY);
       return null;
     }
 
-    const user = this.storage.getUserById(userId);
+    let user: User;
+    try {
+      user = this.storage.getUserById(userId);
+    } catch {
+      sessionStorage.removeItem(MOCK_SESSION_TOKEN_KEY);
+      sessionStorage.removeItem(MOCK_SESSION_USER_ID_KEY);
+      return null;
+    }
+
     return { user, sessionToken: token };
   }
 
   logout(): void {
-    const token = sessionStorage.getItem(MOCK_SESSION_TOKEN_KEY);
-    if (token) {
-      activeSessions.delete(token);
+    if (sessionStorage.getItem(MOCK_SESSION_TOKEN_KEY)) {
       sessionStorage.removeItem(MOCK_SESSION_TOKEN_KEY);
     }
+    sessionStorage.removeItem(MOCK_SESSION_USER_ID_KEY);
   }
 
   private createSession(user: User): AuthenticationResult {
     const token = this.createToken();
-    activeSessions.set(token, user.id);
     sessionStorage.setItem(MOCK_SESSION_TOKEN_KEY, token);
+    sessionStorage.setItem(MOCK_SESSION_USER_ID_KEY, user.id);
     this.storage.setCurrentUserId(user.id);
     return { user, sessionToken: token };
   }
@@ -140,11 +141,7 @@ export class MockAuthenticationProvider extends AuthenticationProvider {
     if (!user.email) {
       return false;
     }
-    const storedDigest = passwordDigests.get(normalizeEmail(user.email));
-    if (storedDigest) {
-      return storedDigest === (await hashPassword(password));
-    }
-    return MOCK_USER_PASSWORDS[user.id] === password;
+    return user.passeord === password;
   }
 
   private createUserId(): string {
@@ -175,23 +172,4 @@ export class MockAuthenticationProvider extends AuthenticationProvider {
       return 'unknown';
     }
   }
-}
-
-async function hashPassword(password: string): Promise<string> {
-  const bytes = new Uint8Array(
-    password.split('').map((character) => character.charCodeAt(0)),
-  );
-  const subtle = globalThis.crypto?.subtle;
-  if (!subtle) {
-    let hash = 2166136261;
-    bytes.forEach((byte) => {
-      hash ^= byte;
-      hash = Math.imul(hash, 16777619);
-    });
-    return `mock-${(hash >>> 0).toString(16)}`;
-  }
-  const digest = await subtle.digest('SHA-256', bytes);
-  return Array.from(new Uint8Array(digest), (byte) =>
-    byte.toString(16).padStart(2, '0'),
-  ).join('');
 }

@@ -56,6 +56,14 @@ describe('LoginComponent', () => {
     expect(password.type).toBe('text');
   });
 
+  it('renders the product introduction and secure workspace label', () => {
+    expect(fixture.nativeElement.textContent).toContain(
+      'A clearer way to make careful decisions.',
+    );
+    expect(fixture.nativeElement.textContent).toContain('Secure workspace');
+    expect(fixture.nativeElement.querySelector('#login-title')).not.toBeNull();
+  });
+
   it('disables the form during login and reports service errors', () => {
     auth.login.mockReturnValue(new Subject());
     fixture.componentInstance.form.setValue({
@@ -83,5 +91,8 @@ describe('LoginComponent', () => {
     expect(
       fixture.nativeElement.querySelector('[role="alert"]'),
     ).not.toBeNull();
+    expect(
+      fixture.nativeElement.querySelector('button[type="submit"]').disabled,
+    ).toBe(true);
   });
 });

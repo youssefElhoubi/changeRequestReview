@@ -9,6 +9,7 @@ describe('AuthGuard', () => {
   const user = {
     id: 'u-alice',
     name: 'Alice',
+    passeord: 'Dev123!ChangeMe',
     role: 'approver' as const,
     permissions: [UserPermission.ViewChangeRequests],
   };

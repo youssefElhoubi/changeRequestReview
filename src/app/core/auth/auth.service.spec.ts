@@ -20,6 +20,7 @@ describe('AuthService', () => {
     id: 'u-alice',
     name: 'Alice',
     email: 'alice@example.com',
+    passeord: 'secret',
     role: 'approver',
     permissions: [],
   };

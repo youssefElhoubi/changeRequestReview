@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
+import { MOCK_USERS } from '../api/mock-data';
 import { MockDataStorageService } from '../api/mock-data-storage.service';
 import { MockAuthenticationProvider } from './mock-authentication.provider';
 import { AuditLogService } from './audit-log.service';
@@ -27,7 +28,7 @@ describe('MockAuthenticationProvider user creation', () => {
     TestBed.resetTestingModule();
   });
 
-  it('creates a viewer with only view permission and no password field', async () => {
+  it('creates a viewer with a persisted development password', async () => {
     const user = await provider.createUser({
       name: 'New User',
       email: ' NEW@example.com ',
@@ -41,7 +42,8 @@ describe('MockAuthenticationProvider user creation', () => {
       permissions: ['view_change_requests'],
     });
     expect(user).not.toHaveProperty('password');
-    expect(JSON.stringify(storage.getUsers())).not.toContain('StrongPass1');
+    expect(user.passeord).toBe('StrongPass1');
+    expect(storage.getUsers()[3].passeord).toBe('StrongPass1');
     expect(auditLog.getLogs()).toEqual([
       expect.objectContaining({
         actorUserId: 'u-alice',
@@ -69,11 +71,31 @@ describe('MockAuthenticationProvider user creation', () => {
     },
   );
 
+  it('keeps every seeded profile paired with a development credential', () => {
+    expect(
+      MOCK_USERS.every(
+        (user) =>
+          user.email &&
+          user.passeord === 'Dev123!ChangeMe' &&
+          !('password' in user),
+      ),
+    ).toBe(true);
+  });
+
   it('rejects an incorrect password for a seeded user', async () => {
     await expect(
       provider.login({
         email: 'alice@example.com',
         password: 'mock-u-alice',
+      }),
+    ).rejects.toThrow('INVALID_CREDENTIALS');
+  });
+
+  it('rejects an unknown email even when the password is valid', async () => {
+    await expect(
+      provider.login({
+        email: 'unknown@example.com',
+        password: 'Dev123!ChangeMe',
       }),
     ).rejects.toThrow('INVALID_CREDENTIALS');
   });
@@ -107,7 +129,7 @@ describe('MockAuthenticationProvider user creation', () => {
     ]);
   });
 
-  it('authenticates a created user without persisting the plaintext password', async () => {
+  it('authenticates a created user using the persisted development password', async () => {
     await provider.createUser({
       name: 'New User',
       email: 'new@example.com',
@@ -120,7 +142,22 @@ describe('MockAuthenticationProvider user creation', () => {
     });
 
     expect(result.user.email).toBe('new@example.com');
-    expect(JSON.stringify(localStorage)).not.toContain('StrongPass1');
+    expect(JSON.stringify(localStorage)).toContain('StrongPass1');
+    expect(JSON.stringify(auditLog.getLogs())).not.toContain('StrongPass1');
+  });
+
+  it('restores a session from session storage after the provider is recreated', async () => {
+    const loginResult = await provider.login({
+      email: 'alice@example.com',
+      password: 'Dev123!ChangeMe',
+    });
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [MockDataStorageService, MockAuthenticationProvider],
+    });
+
+    const reloadedProvider = TestBed.inject(MockAuthenticationProvider);
+    await expect(reloadedProvider.restore()).resolves.toEqual(loginResult);
   });
 
   it('does not leave a user behind when audit persistence fails', async () => {

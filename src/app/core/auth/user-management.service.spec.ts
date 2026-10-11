@@ -26,6 +26,7 @@ describe('UserManagementService', () => {
           name: 'New User',
           email: 'new@example.com',
           role: 'viewer',
+          passeord: 'StrongPass1',
           permissions: [UserPermission.ViewChangeRequests],
         } as User),
       ),
@@ -47,6 +48,7 @@ describe('UserManagementService', () => {
     expect(created).toMatchObject({
       id: 'u-new',
       role: 'viewer',
+      passeord: 'StrongPass1',
       permissions: [UserPermission.ViewChangeRequests],
     });
     expect(provider.createUser).toHaveBeenCalledWith(validInput);
@@ -89,6 +91,7 @@ describe('UserManagementService', () => {
       id: 'u-new',
       name: 'New User',
       email: validInput.email,
+      passeord: 'StrongPass1',
       role: 'viewer',
       permissions: [UserPermission.ViewChangeRequests],
     });

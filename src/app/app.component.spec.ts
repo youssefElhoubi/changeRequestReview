@@ -52,6 +52,7 @@ describe('AppComponent', () => {
         id: 'u-alice',
         name: 'Alice',
         email: 'alice@example.com',
+        passeord: 'Dev123!ChangeMe',
         role: 'approver',
         permissions: [UserPermission.ViewChangeRequests],
       },
