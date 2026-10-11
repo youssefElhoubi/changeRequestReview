@@ -59,7 +59,11 @@ export class MockBackendInterceptor implements HttpInterceptor {
         : this.failure(404, 'NOT_FOUND', 'Change request not found.');
     }
 
-    if (request.method === 'POST' && path === '/api/change-requests' && !match) {
+    if (
+      request.method === 'POST' &&
+      path === '/api/change-requests' &&
+      !match
+    ) {
       return this.handleCreate(request.body);
     }
 
@@ -77,13 +81,13 @@ export class MockBackendInterceptor implements HttpInterceptor {
     this.storage.reset();
   }
 
-  private handleCreate(
-    body: unknown,
-  ): Observable<HttpEvent<unknown>> {
+  private handleCreate(body: unknown): Observable<HttpEvent<unknown>> {
     const currentUser = this.storage.getUserById(
       this.authService.currentUserIdValue,
     );
-    if (!currentUser.permissions.includes(UserPermission.CreateChangeRequests)) {
+    if (
+      !currentUser.permissions.includes(UserPermission.CreateChangeRequests)
+    ) {
       return this.failure(
         403,
         'FORBIDDEN',
@@ -131,9 +135,7 @@ export class MockBackendInterceptor implements HttpInterceptor {
     return this.success(this.clone(changeRequest));
   }
 
-  private parseCreateBody(
-    body: unknown,
-  ): CreateChangeRequestBody | null {
+  private parseCreateBody(body: unknown): CreateChangeRequestBody | null {
     if (!body || typeof body !== 'object') {
       return null;
     }
@@ -206,6 +208,7 @@ export class MockBackendInterceptor implements HttpInterceptor {
       this.authService.currentUserIdValue,
     );
     if (
+      currentUser.role !== 'approver' ||
       !currentUser.permissions.includes(permission) ||
       changeRequest.createdBy.id === currentUser.id
     ) {

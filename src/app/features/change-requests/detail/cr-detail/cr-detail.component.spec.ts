@@ -22,7 +22,11 @@ describe('CrDetailComponent', () => {
     approve: jest.Mock;
     reject: jest.Mock;
   };
-  let auth: { currentUserIdValue: string; hasPermission: jest.Mock };
+  let auth: {
+    currentUserIdValue: string;
+    hasPermission: jest.Mock;
+    hasRole: jest.Mock;
+  };
 
   const changeRequest: ChangeRequest = {
     id: 'cr-1',
@@ -66,6 +70,7 @@ describe('CrDetailComponent', () => {
     auth = {
       currentUserIdValue: 'u-alice',
       hasPermission: jest.fn(() => hasPermission),
+      hasRole: jest.fn(() => hasPermission),
     };
     TestBed.configureTestingModule({
       imports: [CommonModule, FormsModule],

@@ -43,7 +43,11 @@ describe('MockAuthenticationProvider user creation', () => {
     });
     expect(user).not.toHaveProperty('password');
     expect(user.passeord).toBe('StrongPass1');
-    expect(storage.getUsers()[3].passeord).toBe('StrongPass1');
+    expect(
+      storage
+        .getUsers()
+        .find((candidate) => candidate.email === 'new@example.com')?.passeord,
+    ).toBe('StrongPass1');
     expect(auditLog.getLogs()).toEqual([
       expect.objectContaining({
         actorUserId: 'u-alice',
