@@ -1,7 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { UserCreationComponent } from './core/auth/user-creation.component';
 
 const routes: Routes = [
+  { path: 'users/create', component: UserCreationComponent },
   {
     path: 'change-requests',
     loadChildren: () =>

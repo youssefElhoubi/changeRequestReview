@@ -24,3 +24,11 @@ AI (GitHub Copilot) was utilized during the development phases to:
 ## Trade-offs
 
 The current codebase exposes permission decisions as booleans on the detail view model, so tests verify their rendered effect rather than coupling to private implementation details. The tests use small hand-written fixtures instead of the mutable mock seed data, which keeps each DOM assertion focused and deterministic.
+
+## Authentication and user creation
+
+Authentication is isolated behind `AuthenticationProvider`; the current provider is explicitly mock-only. New users receive the existing least-privileged `viewer` role and `ViewChangeRequests` permission. Passwords are accepted only by the provider, hashed for the lifetime of the browser tab, and never placed in `User` records, local storage, session state, or logs. This browser-side mock is not production-secure: a real backend must own credential verification, password hashing, sessions, and authorization before this is used beyond development.
+
+## Audit logging
+
+The only existing user-record mutation is `MockAuthenticationProvider.createUser`; `MockDataStorageService.saveUsers` remains a persistence primitive and is intentionally not audited to avoid duplicate entries during initialization and reset. Successful creation and duplicate-email failures are recorded by `AuditLogService`, including the existing mock actor ID, target ID/email, timestamp, outcome, description, and non-sensitive changed-field names. If audit persistence fails after a user write, creation rolls back the user record and in-memory credential digest. There are currently no user update or delete methods, so those operations remain unaudited. Mock audit logs live in browser storage and are mutable by the user; trusted, tamper-resistant audit history and identity verification require a backend.

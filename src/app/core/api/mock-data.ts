@@ -9,6 +9,7 @@ export const MOCK_USERS: User[] = [
   {
     id: 'u-alice',
     name: 'Alice',
+    email: 'alice@example.com',
     role: 'approver',
     permissions: [
       UserPermission.ViewChangeRequests,
@@ -19,6 +20,7 @@ export const MOCK_USERS: User[] = [
   {
     id: 'u-bob',
     name: 'Bob',
+    email: 'bob@example.com',
     role: 'approver',
     permissions: [
       UserPermission.ViewChangeRequests,
@@ -29,6 +31,7 @@ export const MOCK_USERS: User[] = [
   {
     id: 'u-carol',
     name: 'Carol',
+    email: 'carol@example.com',
     role: 'viewer',
     permissions: [UserPermission.ViewChangeRequests],
   },

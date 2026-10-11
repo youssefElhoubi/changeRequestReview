@@ -28,12 +28,11 @@ export class MockDataStorageService {
     }
     if (localStorage.getItem(MOCK_USERS_STORAGE_KEY) === null) {
       this.saveUsers(MOCK_USERS);
+    } else {
+      this.migrateUserEmails();
     }
     if (localStorage.getItem(MOCK_CURRENT_USER_ID_STORAGE_KEY) === null) {
-      localStorage.setItem(
-        MOCK_CURRENT_USER_ID_STORAGE_KEY,
-        MOCK_USERS[0].id,
-      );
+      localStorage.setItem(MOCK_CURRENT_USER_ID_STORAGE_KEY, MOCK_USERS[0].id);
     }
   }
 
@@ -63,10 +62,7 @@ export class MockDataStorageService {
   reset(): void {
     this.saveChangeRequests(MOCK_CHANGE_REQUESTS);
     this.saveUsers(MOCK_USERS);
-    localStorage.setItem(
-      MOCK_CURRENT_USER_ID_STORAGE_KEY,
-      MOCK_USERS[0].id,
-    );
+    localStorage.setItem(MOCK_CURRENT_USER_ID_STORAGE_KEY, MOCK_USERS[0].id);
   }
 
   getUsers(): User[] {
@@ -96,7 +92,10 @@ export class MockDataStorageService {
     this.initialize();
 
     const userId = localStorage.getItem(MOCK_CURRENT_USER_ID_STORAGE_KEY);
-    if (userId === null || this.getUsers().every((user) => user.id !== userId)) {
+    if (
+      userId === null ||
+      this.getUsers().every((user) => user.id !== userId)
+    ) {
       throw new Error(`Unknown current user: ${userId ?? '(missing)'}`);
     }
 
@@ -122,6 +121,32 @@ export class MockDataStorageService {
 
   private clone<T>(value: T): T {
     return JSON.parse(JSON.stringify(value)) as T;
+  }
+
+  private migrateUserEmails(): void {
+    const raw = localStorage.getItem(MOCK_USERS_STORAGE_KEY);
+    if (raw === null) {
+      return;
+    }
+
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      return;
+    }
+
+    const migrated = parsed.map((value) => {
+      if (!isRecord(value) || typeof value['id'] !== 'string') {
+        return value;
+      }
+      const seed = MOCK_USERS.find((user) => user.id === value['id']);
+      return seed && value['email'] === undefined
+        ? { ...value, email: seed.email }
+        : value;
+    });
+
+    if (JSON.stringify(migrated) !== raw) {
+      localStorage.setItem(MOCK_USERS_STORAGE_KEY, JSON.stringify(migrated));
+    }
   }
 }
 
@@ -153,6 +178,7 @@ function isUser(value: unknown): value is User {
   return (
     typeof value['id'] === 'string' &&
     typeof value['name'] === 'string' &&
+    (value['email'] === undefined || typeof value['email'] === 'string') &&
     isUserRole(value['role']) &&
     Array.isArray(value['permissions']) &&
     value['permissions'].every(isUserPermission)
