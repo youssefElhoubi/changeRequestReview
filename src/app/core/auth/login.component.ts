@@ -10,6 +10,7 @@ import { AuthService } from './auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
+  showPassword = false;
   readonly form = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]],
@@ -44,6 +45,10 @@ export class LoginComponent {
         },
         error: () => this.form.enable(),
       });
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 
   private safeReturnUrl(returnUrl: string): string {

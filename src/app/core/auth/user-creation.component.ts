@@ -10,6 +10,7 @@ import { UserManagementService } from './user-management.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserCreationComponent {
+  showPassword = false;
   readonly form = this.formBuilder.group({
     name: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
@@ -52,6 +53,10 @@ export class UserCreationComponent {
         },
         error: () => this.form.enable(),
       });
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 
   cancel(): void {
