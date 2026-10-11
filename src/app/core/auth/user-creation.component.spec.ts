@@ -78,4 +78,36 @@ describe('UserCreationComponent', () => {
     fixture.detectChanges();
     expect(password.type).toBe('text');
   });
+
+  it('matches the workspace creation hierarchy and exposes the three fields', () => {
+    expect(fixture.nativeElement.textContent).toContain(
+      'Give the right people the right access.',
+    );
+    expect(fixture.nativeElement.textContent).toContain('Thoughtful access');
+    expect(
+      fixture.nativeElement.querySelector('#user-creation-title'),
+    ).not.toBeNull();
+    expect(
+      fixture.nativeElement.querySelectorAll('input').length,
+    ).toBe(3);
+  });
+
+  it('shows the duplicate-email error from the creation service', () => {
+    creationState$.next({
+      status: 'error',
+      user: null,
+      error: {
+        code: 'DUPLICATE_EMAIL',
+        message: 'A user with this email already exists.',
+      },
+    });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain(
+      'A user with this email already exists.',
+    );
+    expect(
+      fixture.nativeElement.querySelector('[role="alert"]'),
+    ).not.toBeNull();
+  });
 });

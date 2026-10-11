@@ -146,6 +146,31 @@ describe('MockAuthenticationProvider user creation', () => {
     expect(JSON.stringify(auditLog.getLogs())).not.toContain('StrongPass1');
   });
 
+  it('authenticates a created user after the provider is recreated', async () => {
+    await provider.createUser({
+      name: 'Refresh User',
+      email: 'refresh@example.com',
+      password: 'StrongPass1',
+    });
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [MockDataStorageService, MockAuthenticationProvider],
+    });
+
+    const reloadedProvider = TestBed.inject(MockAuthenticationProvider);
+    await expect(
+      reloadedProvider.login({
+        email: 'refresh@example.com',
+        password: 'StrongPass1',
+      }),
+    ).resolves.toMatchObject({
+      user: {
+        email: 'refresh@example.com',
+        passeord: 'StrongPass1',
+      },
+    });
+  });
+
   it('restores a session from session storage after the provider is recreated', async () => {
     const loginResult = await provider.login({
       email: 'alice@example.com',
