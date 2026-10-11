@@ -13,6 +13,7 @@ import { AuthService, AuthenticationState } from './core/auth/auth.service';
 export class AppComponent {
   readonly authState$ = this.authService.state$;
   readonly viewPermission = UserPermission.ViewChangeRequests;
+  readonly createPermission = UserPermission.CreateChangeRequests;
 
   constructor(
     private readonly authService: AuthService,
@@ -21,6 +22,10 @@ export class AppComponent {
 
   canCreateUsers(state: AuthenticationState): boolean {
     return state.user?.role === 'approver';
+  }
+
+  canCreateRequests(state: AuthenticationState): boolean {
+    return state.user?.permissions.includes(UserPermission.CreateChangeRequests) ?? false;
   }
 
   logout(): void {

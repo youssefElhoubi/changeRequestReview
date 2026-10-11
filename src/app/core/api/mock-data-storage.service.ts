@@ -225,12 +225,13 @@ function isUser(value: unknown): value is User {
 }
 
 function isUserRole(value: unknown): value is UserRole {
-  return value === 'approver' || value === 'viewer';
+  return value === 'approver' || value === 'viewer' || value === 'requester';
 }
 
 function isUserPermission(value: unknown): value is UserPermission {
   return (
     value === UserPermission.ViewChangeRequests ||
+    value === UserPermission.CreateChangeRequests ||
     value === UserPermission.ApproveChangeRequests ||
     value === UserPermission.RejectChangeRequests
   );

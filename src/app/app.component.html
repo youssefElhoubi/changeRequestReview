@@ -56,10 +56,26 @@
             *ngIf="user.permissions.includes(viewPermission)"
             routerLink="/change-requests"
             routerLinkActive="font-semibold text-slate-900"
-            [routerLinkActiveOptions]="{ exact: false }"
+            [routerLinkActiveOptions]="{ exact: true }"
             class="text-slate-600 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
           >
             Change requests
+          </a>
+          <a
+            *ngIf="canCreateRequests(authState)"
+            routerLink="/change-requests/create"
+            routerLinkActive="font-semibold text-slate-900"
+            class="text-slate-600 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+          >
+            New request
+          </a>
+          <a
+            *ngIf="canCreateRequests(authState)"
+            routerLink="/change-requests/my-requests"
+            routerLinkActive="font-semibold text-slate-900"
+            class="text-slate-600 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+          >
+            My requests
           </a>
           <a
             *ngIf="canCreateUsers(authState)"

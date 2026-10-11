@@ -14,6 +14,7 @@ import { AuthService } from '../auth/auth.service';
 import {
   ChangeRequest,
   ChangeRequestStatus,
+  CreateChangeRequestBody,
   RejectChangeRequestBody,
   UserPermission,
 } from '../../features/change-requests/models/change-request.models';
@@ -58,6 +59,10 @@ export class MockBackendInterceptor implements HttpInterceptor {
         : this.failure(404, 'NOT_FOUND', 'Change request not found.');
     }
 
+    if (request.method === 'POST' && path === '/api/change-requests' && !match) {
+      return this.handleCreate(request.body);
+    }
+
     if (request.method === 'POST' && match && match[2]) {
       const action = match[2];
       if (action === 'approve' || action === 'reject') {
@@ -70,6 +75,108 @@ export class MockBackendInterceptor implements HttpInterceptor {
 
   reset(): void {
     this.storage.reset();
+  }
+
+  private handleCreate(
+    body: unknown,
+  ): Observable<HttpEvent<unknown>> {
+    const currentUser = this.storage.getUserById(
+      this.authService.currentUserIdValue,
+    );
+    if (!currentUser.permissions.includes(UserPermission.CreateChangeRequests)) {
+      return this.failure(
+        403,
+        'FORBIDDEN',
+        'You do not have permission to create change requests.',
+      );
+    }
+
+    const parsed = this.parseCreateBody(body);
+    if (!parsed) {
+      return this.failure(
+        400,
+        'VALIDATION',
+        'Title, description, and at least one change are required.',
+      );
+    }
+
+    const now = new Date().toISOString();
+    const id = `cr-${Date.now()}`;
+    const changeRequest: ChangeRequest = {
+      id,
+      title: parsed.title,
+      description: parsed.description,
+      status: ChangeRequestStatus.Draft,
+      createdBy: { id: currentUser.id, name: currentUser.name },
+      createdAt: now,
+      changeCount: parsed.changes.length,
+      changes: parsed.changes.map((change, index) => ({
+        id: `${id}-change-${index}`,
+        field: change.field,
+        before: change.before,
+        after: change.after,
+      })),
+      timeline: [
+        {
+          id: `${id}-created`,
+          type: 'created',
+          actor: { id: currentUser.id, name: currentUser.name },
+          at: now,
+        },
+      ],
+    };
+
+    const requests = this.storage.getChangeRequests();
+    this.storage.saveChangeRequests([...requests, changeRequest]);
+    return this.success(this.clone(changeRequest));
+  }
+
+  private parseCreateBody(
+    body: unknown,
+  ): CreateChangeRequestBody | null {
+    if (!body || typeof body !== 'object') {
+      return null;
+    }
+    const record = body as Record<string, unknown>;
+    const title =
+      typeof record['title'] === 'string' ? record['title'].trim() : '';
+    const description =
+      typeof record['description'] === 'string'
+        ? record['description'].trim()
+        : '';
+    if (!title || !description || !Array.isArray(record['changes'])) {
+      return null;
+    }
+    const changes = record['changes'].filter(
+      (entry): entry is { field: string; before: unknown; after: unknown } =>
+        !!entry &&
+        typeof entry === 'object' &&
+        typeof (entry as Record<string, unknown>)['field'] === 'string',
+    );
+    if (changes.length === 0) {
+      return null;
+    }
+    return {
+      title,
+      description,
+      changes: changes.map((c) => ({
+        field: c.field,
+        before:
+          c.before === null ||
+          typeof c.before === 'string' ||
+          typeof c.before === 'number' ||
+          typeof c.before === 'boolean'
+            ? c.before
+            : null,
+        after:
+          c.after === null ||
+          typeof c.after === 'string' ||
+          typeof c.after === 'number' ||
+          typeof c.after === 'boolean'
+            ? c.after
+            : null,
+      })),
+    };
   }
 
   private handleAction(

@@ -7,11 +7,12 @@ export enum ChangeRequestStatus {
 
 export enum UserPermission {
   ViewChangeRequests = 'view_change_requests',
+  CreateChangeRequests = 'create_change_requests',
   ApproveChangeRequests = 'approve_change_requests',
   RejectChangeRequests = 'reject_change_requests',
 }
 
-export type UserRole = 'approver' | 'viewer';
+export type UserRole = 'approver' | 'viewer' | 'requester';
 
 export interface User {
   id: string;
@@ -113,4 +114,10 @@ export interface ChangeRequest extends ChangeRequestSummary {
 
 export interface RejectChangeRequestBody {
   reason: string;
+}
+
+export interface CreateChangeRequestBody {
+  title: string;
+  description: string;
+  changes: Omit<ChangeEntry, 'id'>[];
 }

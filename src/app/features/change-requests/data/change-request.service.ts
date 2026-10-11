@@ -6,6 +6,7 @@ import {
   ChangeRequest,
   ChangeRequestStatus,
   ChangeRequestSummary,
+  CreateChangeRequestBody,
   RejectChangeRequestBody,
 } from '../models/change-request.models';
 
@@ -27,6 +28,10 @@ export class ChangeRequestService {
 
   getChangeRequest(id: string): Observable<ChangeRequest> {
     return this.http.get<ChangeRequest>(`${this.endpoint}/${id}`);
+  }
+
+  create(body: CreateChangeRequestBody): Observable<ChangeRequest> {
+    return this.http.post<ChangeRequest>(this.endpoint, body);
   }
 
   approve(id: string): Observable<ChangeRequest> {

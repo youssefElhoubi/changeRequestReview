@@ -42,6 +42,17 @@ export const MOCK_USERS: User[] = [
     role: 'viewer',
     permissions: [UserPermission.ViewChangeRequests],
   },
+  {
+    id: 'u-dave',
+    name: 'Dave',
+    email: 'dave@example.com',
+    passeord: DEVELOPMENT_PASSWORD,
+    role: 'requester',
+    permissions: [
+      UserPermission.ViewChangeRequests,
+      UserPermission.CreateChangeRequests,
+    ],
+  },
 ];
 
 export const MOCK_CHANGE_REQUESTS: ChangeRequest[] = [
