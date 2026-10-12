@@ -3,7 +3,9 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   Output,
+  SimpleChanges,
 } from '@angular/core';
 
 import { ChangeRequest } from '../../models/change-request.models';
@@ -13,7 +15,7 @@ import { ChangeRequest } from '../../models/change-request.models';
   templateUrl: './cr-actions.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CrActionsComponent {
+export class CrActionsComponent implements OnChanges {
   @Input() changeRequest: ChangeRequest | null = null;
   @Input() canApprove = false;
   @Input() canReject = false;
@@ -26,6 +28,13 @@ export class CrActionsComponent {
 
   reason = '';
   validationMessage = '';
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['changeRequest']) {
+      this.reason = '';
+      this.validationMessage = '';
+    }
+  }
 
   onApprove(): void {
     if (this.changeRequest && this.canApprove && !this.actionInFlight) {

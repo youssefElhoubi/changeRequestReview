@@ -20,7 +20,7 @@
       <span>Status filter</span>
       <select
         data-testid="status-filter"
-        class="rounded-control border border-line bg-surface px-control-x py-control-y shadow-surface transition duration-standard focus:border-brand-500 focus:outline-none"
+        class="rounded-control border border-line bg-surface px-control-x py-control-y text-sm text-ink shadow-surface outline-none transition duration-standard focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
         [value]="statusFilter"
         (change)="onStatusFilterEvent($event)"
         aria-label="Filter change requests by status"
@@ -36,49 +36,62 @@
   <ng-container *ngIf="authState$ | async as authState">
     <section
       *ngIf="authState.status === 'authenticated' && authState.user as user"
-      class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
+      class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
       aria-label="Change request shortcuts"
     >
       <a
         *ngIf="hasCreatePermission(user.permissions)"
         routerLink="/change-requests/create"
-        class="flex items-center justify-between rounded-panel border border-line bg-surface p-4 shadow-surface transition duration-standard hover:border-brand-500 hover:shadow-floating"
+        class="group flex items-center justify-between rounded-panel border border-line bg-surface p-4 shadow-surface transition duration-standard hover:border-brand-500 hover:shadow-floating focus:outline-none focus:ring-2 focus:ring-brand-500/20"
       >
-        <span>
-          <span class="block text-sm font-semibold text-ink">New request</span>
-          <span class="mt-1 block text-xs text-muted"
-            >Submit a change for review</span
-          >
-        </span>
-        <span class="text-xl font-light text-brand-600" aria-hidden="true"
-          >+</span
-        >
+        <div class="flex items-center gap-3">
+          <span class="flex h-10 w-10 items-center justify-center rounded-control bg-brand-50 text-brand-600 group-hover:bg-brand-600 group-hover:text-white transition duration-standard">
+            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span>
+            <span class="block text-sm font-semibold text-ink group-hover:text-brand-600 transition duration-standard">New request</span>
+            <span class="block text-xs text-muted">Submit a change for review</span>
+          </span>
+        </div>
+        <span class="text-sm font-semibold text-muted group-hover:text-brand-600 transition duration-standard" aria-hidden="true">→</span>
       </a>
       <a
         *ngIf="hasCreatePermission(user.permissions)"
         routerLink="/change-requests/my-requests"
-        class="flex items-center justify-between rounded-panel border border-line bg-surface p-4 shadow-surface transition duration-standard hover:border-brand-500 hover:shadow-floating"
+        class="group flex items-center justify-between rounded-panel border border-line bg-surface p-4 shadow-surface transition duration-standard hover:border-brand-500 hover:shadow-floating focus:outline-none focus:ring-2 focus:ring-brand-500/20"
       >
-        <span>
-          <span class="block text-sm font-semibold text-ink">My requests</span>
-          <span class="mt-1 block text-xs text-muted"
-            >Track requests you submitted</span
-          >
-        </span>
-        <span class="text-muted" aria-hidden="true">→</span>
+        <div class="flex items-center gap-3">
+          <span class="flex h-10 w-10 items-center justify-center rounded-control bg-brand-50 text-brand-600 group-hover:bg-brand-600 group-hover:text-white transition duration-standard">
+            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M10 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM4 16.5a6 6 0 0 1 12 0" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span>
+            <span class="block text-sm font-semibold text-ink group-hover:text-brand-600 transition duration-standard">My requests</span>
+            <span class="block text-xs text-muted">Track requests you submitted</span>
+          </span>
+        </div>
+        <span class="text-sm font-semibold text-muted group-hover:text-brand-600 transition duration-standard" aria-hidden="true">→</span>
       </a>
       <a
         *ngIf="canCreateUsers(user.role)"
         routerLink="/users/create"
-        class="flex items-center justify-between rounded-panel border border-line bg-surface p-4 shadow-surface transition duration-standard hover:border-brand-500 hover:shadow-floating"
+        class="group flex items-center justify-between rounded-panel border border-line bg-surface p-4 shadow-surface transition duration-standard hover:border-brand-500 hover:shadow-floating focus:outline-none focus:ring-2 focus:ring-brand-500/20"
       >
-        <span>
-          <span class="block text-sm font-semibold text-ink">Create user</span>
-          <span class="mt-1 block text-xs text-muted"
-            >Add a workspace member</span
-          >
-        </span>
-        <span class="text-muted" aria-hidden="true">→</span>
+        <div class="flex items-center gap-3">
+          <span class="flex h-10 w-10 items-center justify-center rounded-control bg-brand-50 text-brand-600 group-hover:bg-brand-600 group-hover:text-white transition duration-standard">
+            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M10 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM4 16.5a6 6 0 0 1 12 0ZM15 5v4M13 7h4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span>
+            <span class="block text-sm font-semibold text-ink group-hover:text-brand-600 transition duration-standard">Create user</span>
+            <span class="block text-xs text-muted">Add a workspace member</span>
+          </span>
+        </div>
+        <span class="text-sm font-semibold text-muted group-hover:text-brand-600 transition duration-standard" aria-hidden="true">→</span>
       </a>
     </section>
   </ng-container>
@@ -89,7 +102,7 @@
       class="rounded-panel border border-line bg-surface p-8 text-center shadow-surface"
       aria-busy="true"
     >
-      <div class="flex items-center justify-center gap-3 text-muted">
+      <div class="flex items-center justify-center gap-3 text-sm font-medium text-muted">
         <svg
           data-testid="loading-spinner"
           class="h-6 w-6 animate-spin text-brand-600"
@@ -132,15 +145,21 @@
       <article
         class="rounded-panel border border-line bg-surface p-5 shadow-surface"
       >
-        <p class="text-sm font-medium text-muted">Total requests</p>
-        <p class="mt-2 text-2xl font-semibold text-ink">{{ rows.length }}</p>
+        <div class="flex items-center justify-between">
+          <p class="text-sm font-medium text-muted">Total requests</p>
+          <span class="h-2 w-2 rounded-full bg-brand-600" aria-hidden="true"></span>
+        </div>
+        <p class="mt-2 text-2xl font-bold text-ink">{{ rows.length }}</p>
         <p class="mt-1 text-xs text-muted">Across your workspace</p>
       </article>
       <article
         class="rounded-panel border border-line bg-surface p-5 shadow-surface"
       >
-        <p class="text-sm font-medium text-muted">Pending review</p>
-        <p class="mt-2 text-2xl font-semibold text-warning-700">
+        <div class="flex items-center justify-between">
+          <p class="text-sm font-medium text-muted">Pending review</p>
+          <span class="h-2 w-2 rounded-full bg-warning-600" aria-hidden="true"></span>
+        </div>
+        <p class="mt-2 text-2xl font-bold text-warning-700">
           {{ countByStatus(pendingReviewStatus) }}
         </p>
         <p class="mt-1 text-xs text-muted">Awaiting a decision</p>
@@ -148,8 +167,11 @@
       <article
         class="rounded-panel border border-line bg-surface p-5 shadow-surface"
       >
-        <p class="text-sm font-medium text-muted">Approved</p>
-        <p class="mt-2 text-2xl font-semibold text-success-700">
+        <div class="flex items-center justify-between">
+          <p class="text-sm font-medium text-muted">Approved</p>
+          <span class="h-2 w-2 rounded-full bg-success-600" aria-hidden="true"></span>
+        </div>
+        <p class="mt-2 text-2xl font-bold text-success-700">
           {{ countByStatus(approvedStatus) }}
         </p>
         <p class="mt-1 text-xs text-muted">Completed approvals</p>
@@ -157,8 +179,11 @@
       <article
         class="rounded-panel border border-line bg-surface p-5 shadow-surface"
       >
-        <p class="text-sm font-medium text-muted">Rejected</p>
-        <p class="mt-2 text-2xl font-semibold text-danger-700">
+        <div class="flex items-center justify-between">
+          <p class="text-sm font-medium text-muted">Rejected</p>
+          <span class="h-2 w-2 rounded-full bg-danger-600" aria-hidden="true"></span>
+        </div>
+        <p class="mt-2 text-2xl font-bold text-danger-700">
           {{ countByStatus(rejectedStatus) }}
         </p>
         <p class="mt-1 text-xs text-muted">Returned for revision</p>
@@ -170,7 +195,7 @@
       class="rounded-panel border border-line bg-surface p-10 text-center shadow-surface"
     >
       <h2 class="text-lg font-semibold text-ink">No change requests yet</h2>
-      <p class="mt-1 text-muted">There are no change requests to display.</p>
+      <p class="mt-1 text-sm text-muted">There are no change requests to display.</p>
     </section>
 
     <ng-container *ngIf="vm.state === 'loaded'">
@@ -181,7 +206,7 @@
         <h2 class="text-lg font-semibold text-ink">
           No matching change requests
         </h2>
-        <p class="mt-1 text-muted">Try selecting a different status.</p>
+        <p class="mt-1 text-sm text-muted">Try selecting a different status.</p>
       </section>
 
       <section

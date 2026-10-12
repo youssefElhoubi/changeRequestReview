@@ -214,8 +214,8 @@ export class MockBackendInterceptor implements HttpInterceptor {
       this.authService.currentUserIdValue,
     );
     if (
-      currentUser.role !== 'approver' ||
-      !currentUser.permissions.includes(permission) ||
+      !this.authService.hasRole('approver') ||
+      !this.authService.hasPermission(permission) ||
       changeRequest.createdBy.id === currentUser.id
     ) {
       return this.failure(

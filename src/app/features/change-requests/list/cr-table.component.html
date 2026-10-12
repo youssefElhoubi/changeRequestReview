@@ -2,48 +2,58 @@
   class="overflow-x-auto rounded-panel border border-line bg-surface shadow-surface"
 >
   <table class="min-w-full divide-y divide-line text-left text-sm">
-    <thead class="bg-canvas text-xs uppercase tracking-wide text-muted">
+    <thead class="bg-canvas text-xs uppercase tracking-wider text-muted">
       <tr>
-        <th scope="col" class="px-4 py-3 font-semibold">Title</th>
-        <th scope="col" class="px-4 py-3 font-semibold">Status</th>
-        <th scope="col" class="px-4 py-3 font-semibold">Created by</th>
-        <th scope="col" class="px-4 py-3 font-semibold">Created</th>
-        <th scope="col" class="px-4 py-3 text-right font-semibold">Changes</th>
+        <th scope="col" class="px-5 py-3.5 font-semibold">Title</th>
+        <th scope="col" class="px-5 py-3.5 font-semibold">Status</th>
+        <th scope="col" class="px-5 py-3.5 font-semibold">Created by</th>
+        <th scope="col" class="px-5 py-3.5 font-semibold">Created</th>
+        <th scope="col" class="px-5 py-3.5 text-right font-semibold">Changes</th>
       </tr>
     </thead>
     <tbody class="divide-y divide-line">
       <tr
         *ngFor="let row of rows; trackBy: trackById"
         data-testid="cr-row"
-        class="cursor-pointer transition-colors duration-standard hover:bg-brand-50 focus-within:bg-brand-50"
+        class="group cursor-pointer transition-colors duration-standard hover:bg-canvas focus-within:bg-canvas focus:outline-none"
         tabindex="0"
         (click)="onRowClick(row)"
         (keydown.enter)="onRowClick(row)"
         (keydown.space)="$event.preventDefault(); onRowClick(row)"
       >
-        <td class="whitespace-nowrap px-4 py-3 font-medium text-ink">
+        <td class="whitespace-nowrap px-5 py-3.5 font-semibold text-ink group-hover:text-brand-600 transition duration-standard">
           {{ row.title }}
         </td>
-        <td class="whitespace-nowrap px-4 py-3">
+        <td class="whitespace-nowrap px-5 py-3.5">
           <span
-            class="inline-flex rounded-pill px-2.5 py-1 text-xs font-semibold"
+            class="inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-xs font-semibold"
             [ngClass]="{
-              'bg-canvas text-muted': row.status === 'draft',
-              'bg-warning-50 text-warning-700': row.status === 'pending_review',
-              'bg-success-50 text-success-700': row.status === 'approved',
-              'bg-danger-50 text-danger-700': row.status === 'rejected',
+              'border border-line bg-canvas text-muted': row.status === 'draft',
+              'border border-warning-600/20 bg-warning-50 text-warning-700': row.status === 'pending_review',
+              'border border-success-600/20 bg-success-50 text-success-700': row.status === 'approved',
+              'border border-danger-600/20 bg-danger-50 text-danger-700': row.status === 'rejected',
             }"
           >
-            {{ row.status.replace("_", " ") }}
+            <span
+              class="h-1.5 w-1.5 rounded-full"
+              [ngClass]="{
+                'bg-muted': row.status === 'draft',
+                'bg-warning-600': row.status === 'pending_review',
+                'bg-success-600': row.status === 'approved',
+                'bg-danger-600': row.status === 'rejected',
+              }"
+              aria-hidden="true"
+            ></span>
+            <span>{{ row.status.replace("_", " ") }}</span>
           </span>
         </td>
-        <td class="whitespace-nowrap px-4 py-3 text-muted">
+        <td class="whitespace-nowrap px-5 py-3.5 text-muted">
           {{ row.createdBy.name }}
         </td>
-        <td class="whitespace-nowrap px-4 py-3 text-muted">
+        <td class="whitespace-nowrap px-5 py-3.5 text-muted">
           {{ row.createdAt | date: "mediumDate" }}
         </td>
-        <td class="whitespace-nowrap px-4 py-3 text-right text-muted">
+        <td class="whitespace-nowrap px-5 py-3.5 text-right font-medium text-muted">
           {{ row.changeCount }}
         </td>
       </tr>

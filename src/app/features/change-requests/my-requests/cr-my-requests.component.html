@@ -1,22 +1,25 @@
 <main
-  class="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6 lg:px-8"
+  class="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8"
   aria-live="polite"
 >
-  <header class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-    <div>
-      <p class="text-sm font-semibold uppercase tracking-wide text-indigo-600">
+  <header class="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+    <div class="max-w-2xl">
+      <p class="text-sm font-semibold uppercase tracking-wide text-brand-600">
         Your workspace
       </p>
-      <h1 class="mt-1 text-3xl font-bold tracking-tight text-slate-900">
+      <h1 class="mt-1 text-page-title font-bold tracking-tight text-ink">
         My requests
       </h1>
+      <p class="mt-2 text-muted">
+        Track requests you submitted and monitor reviewer decisions.
+      </p>
     </div>
 
-    <label class="flex flex-col gap-1 text-sm font-medium text-slate-700">
+    <label class="flex flex-col gap-1 text-sm font-medium text-ink">
       <span>Status filter</span>
       <select
         data-testid="my-requests-status-filter"
-        class="rounded-md border border-slate-300 bg-white px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+        class="rounded-control border border-line bg-surface px-control-x py-control-y text-sm text-ink shadow-surface outline-none transition duration-standard focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
         [value]="statusFilter"
         (change)="onStatusFilterEvent($event)"
         aria-label="Filter your requests by status"
@@ -32,12 +35,12 @@
   <ng-container *ngIf="vm$ | async as vm">
     <section
       *ngIf="vm.state === 'loading'"
-      class="rounded-lg border border-slate-200 bg-white p-8 text-center"
+      class="rounded-panel border border-line bg-surface p-8 text-center shadow-surface"
       aria-busy="true"
     >
-      <div class="flex items-center justify-center gap-3 text-slate-600">
+      <div class="flex items-center justify-center gap-3 text-sm font-medium text-muted">
         <svg
-          class="h-6 w-6 animate-spin text-indigo-600"
+          class="h-5 w-5 animate-spin text-brand-600"
           viewBox="0 0 24 24"
           fill="none"
           role="status"
@@ -63,7 +66,7 @@
 
     <section
       *ngIf="vm.state === 'error'"
-      class="rounded-lg border border-rose-200 bg-rose-50 p-6 text-rose-800"
+      class="rounded-panel border border-danger-50 bg-danger-50 p-6 text-danger-700"
       role="alert"
     >
       {{ vm.errorMessage }}
@@ -71,30 +74,52 @@
 
     <section
       *ngIf="vm.state === 'empty'"
-      class="rounded-lg border border-slate-200 bg-white p-8 text-center"
+      class="rounded-panel border border-line bg-surface p-10 text-center shadow-surface"
     >
-      <h2 class="text-lg font-semibold text-slate-900">No requests yet</h2>
-      <p class="mt-1 text-slate-600">
+      <h2 class="text-lg font-semibold text-ink">No requests yet</h2>
+      <p class="mt-1 text-sm text-muted">
         You haven't submitted any change requests.
       </p>
+      <div class="mt-6">
+        <a
+          routerLink="/change-requests/create"
+          class="inline-flex items-center justify-center gap-2 rounded-control bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-surface transition duration-standard hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+        >
+          Submit a new request
+        </a>
+      </div>
     </section>
 
     <ng-container *ngIf="vm.state === 'loaded'">
       <section
         *ngIf="visibleRows.length === 0"
-        class="rounded-lg border border-slate-200 bg-white p-8 text-center"
+        class="rounded-panel border border-line bg-surface p-10 text-center shadow-surface"
       >
-        <h2 class="text-lg font-semibold text-slate-900">
+        <h2 class="text-lg font-semibold text-ink">
           No matching requests
         </h2>
-        <p class="mt-1 text-slate-600">Try selecting a different status.</p>
+        <p class="mt-1 text-sm text-muted">Try selecting a different status.</p>
       </section>
 
-      <app-cr-table
-        *ngIf="visibleRows.length > 0"
-        [rows]="visibleRows"
-        (rowClick)="onRowClick($event)"
-      ></app-cr-table>
+      <section *ngIf="visibleRows.length > 0" aria-labelledby="my-submissions-title">
+        <div class="mb-3 flex items-end justify-between gap-4">
+          <div>
+            <h2 id="my-submissions-title" class="text-lg font-semibold text-ink">
+              Your submissions
+            </h2>
+            <p class="mt-1 text-sm text-muted">
+              Select a request to view details, compare values, or track approval progress.
+            </p>
+          </div>
+          <span class="hidden text-sm text-muted sm:block">
+            {{ visibleRows.length }} request{{ visibleRows.length === 1 ? "" : "s" }}
+          </span>
+        </div>
+        <app-cr-table
+          [rows]="visibleRows"
+          (rowClick)="onRowClick($event)"
+        ></app-cr-table>
+      </section>
     </ng-container>
   </ng-container>
 </main>

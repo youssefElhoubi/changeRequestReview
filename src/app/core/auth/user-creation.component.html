@@ -1,362 +1,335 @@
 <main
-  class="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 sm:py-10 lg:flex lg:items-center lg:justify-center"
+  class="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-6 lg:px-8"
   aria-live="polite"
 >
-  <div class="w-full max-w-6xl">
-    <div class="mb-6 flex items-center justify-between px-1 sm:mb-8 sm:px-2">
-      <a
-        routerLink="/change-requests"
-        class="flex items-center gap-3 text-sm font-semibold tracking-tight text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-4"
-      >
-        <span
-          class="flex h-9 w-9 items-center justify-center rounded-md bg-indigo-700 text-xs font-bold tracking-widest text-white"
-          aria-hidden="true"
-          >CR</span
-        >
-        <span>Change request review</span>
-      </a>
-      <span
-        class="hidden text-xs font-medium uppercase tracking-widest text-slate-400 sm:block"
-        >User management</span
-      >
+  <header class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+    <div class="max-w-2xl">
+      <p class="text-sm font-semibold uppercase tracking-wide text-brand-600">
+        User management
+      </p>
+      <h1 class="mt-1 text-page-title font-bold tracking-tight text-ink">
+        {{ isEditMode ? "Edit user" : "Create a user" }}
+      </h1>
+      <p class="mt-2 text-muted">
+        {{
+          isEditMode
+            ? "Configure role and permissions for this teammate."
+            : "Add a teammate and configure their role and review permissions."
+        }}
+      </p>
     </div>
 
     <div
-      class="grid overflow-hidden border border-slate-200 bg-white shadow-lg shadow-slate-200/50 lg:grid-cols-[0.85fr_1.15fr]"
+      class="inline-flex items-center gap-3 rounded-panel border border-line bg-surface px-4 py-2.5 shadow-surface text-sm"
     >
-      <section
-        class="bg-slate-900 px-6 py-8 text-white sm:px-10 sm:py-10 lg:flex lg:min-h-[620px] lg:flex-col lg:justify-between lg:px-12 lg:py-12"
-        aria-labelledby="user-creation-introduction"
-      >
-        <div>
-          <p
-            class="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-300"
-          >
-            Thoughtful access
-          </p>
-          <h1
-            id="user-creation-introduction"
-            class="mt-6 max-w-md text-3xl font-semibold leading-tight tracking-tight sm:text-4xl"
-          >
-            Give the right people the right access.
-          </h1>
-          <p class="mt-5 max-w-sm text-sm leading-7 text-slate-300">
-            Add a teammate with a secure sign-in. New users start with view-only
-            access and can be granted more through the established review
-            process.
-          </p>
-        </div>
-
-        <dl
-          class="mt-10 grid max-w-sm grid-cols-2 gap-6 border-t border-slate-700 pt-6 lg:mt-0"
-        >
-          <div>
-            <dt class="text-xs uppercase tracking-wider text-slate-400">
-              Selected role
-            </dt>
-            <dd class="mt-1 text-sm font-medium text-slate-100">
-              {{ getRoleLabel(form.controls.role.value) }}
-            </dd>
-          </div>
-          <div>
-            <dt class="text-xs uppercase tracking-wider text-slate-400">
-              Permissions
-            </dt>
-            <dd class="mt-1 text-sm font-medium text-slate-100">
-              {{ form.controls.permissions.value.length }} granted
-            </dd>
-          </div>
-        </dl>
-      </section>
-
-      <section
-        class="px-6 py-8 sm:px-10 sm:py-12 lg:flex lg:min-h-[620px] lg:items-center lg:px-16"
-        aria-labelledby="user-creation-title"
-      >
-        <div class="w-full max-w-md">
-          <header>
-            <p class="text-sm font-medium text-indigo-700">User management</p>
-            <h2
-              id="user-creation-title"
-              class="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl"
-            >
-              {{ isEditMode ? "Edit user" : "Create a user" }}
-            </h2>
-            <p class="mt-3 text-sm leading-6 text-slate-600">
-              {{
-                isEditMode
-                  ? "Configure role and permissions for this teammate."
-                  : "Add a teammate and configure their role and permissions."
-              }}
-            </p>
-          </header>
-
-          <form
-            class="mt-8 space-y-5"
-            [formGroup]="form"
-            (ngSubmit)="submit()"
-            [attr.aria-label]="isEditMode ? 'Edit user' : 'Create user'"
-          >
-            <div>
-              <label
-                class="block text-sm font-semibold text-slate-800"
-                for="user-name"
-              >
-                Name
-              </label>
-              <input
-                id="user-name"
-                class="mt-2 block w-full border border-slate-300 bg-white px-3.5 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20 disabled:cursor-not-allowed disabled:bg-slate-100"
-                [class.border-rose-500]="
-                  form.controls.name.touched && form.controls.name.invalid
-                "
-                formControlName="name"
-                type="text"
-                autocomplete="name"
-                aria-describedby="user-name-error"
-              />
-              <p
-                *ngIf="form.controls.name.touched && form.controls.name.invalid"
-                id="user-name-error"
-                class="mt-2 text-sm text-rose-700"
-                role="alert"
-              >
-                Enter the user's name.
-              </p>
-            </div>
-
-            <div>
-              <label
-                class="block text-sm font-semibold text-slate-800"
-                for="user-email"
-              >
-                Email address
-              </label>
-              <input
-                id="user-email"
-                class="mt-2 block w-full border border-slate-300 bg-white px-3.5 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20 disabled:cursor-not-allowed disabled:bg-slate-100"
-                [class.border-rose-500]="
-                  form.controls.email.touched && form.controls.email.invalid
-                "
-                formControlName="email"
-                type="email"
-                autocomplete="email"
-                autocapitalize="none"
-                spellcheck="false"
-                aria-describedby="user-email-error"
-              />
-              <p
-                *ngIf="
-                  form.controls.email.touched && form.controls.email.invalid
-                "
-                id="user-email-error"
-                class="mt-2 text-sm text-rose-700"
-                role="alert"
-              >
-                Enter a valid email address.
-              </p>
-            </div>
-
-            <div *ngIf="!isEditMode">
-              <label
-                class="block text-sm font-semibold text-slate-800"
-                for="user-password"
-              >
-                Password
-              </label>
-              <div class="relative mt-2">
-                <input
-                  id="user-password"
-                  class="block w-full border border-slate-300 bg-white px-3.5 py-3 pr-20 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20 disabled:cursor-not-allowed disabled:bg-slate-100"
-                  [class.border-rose-500]="
-                    form.controls.password.touched &&
-                    form.controls.password.invalid
-                  "
-                  formControlName="password"
-                  [type]="showPassword ? 'text' : 'password'"
-                  autocomplete="new-password"
-                  aria-describedby="user-password-help user-password-error"
-                />
-                <button
-                  type="button"
-                  class="absolute inset-y-0 right-0 px-3.5 text-xs font-semibold text-slate-600 underline-offset-2 hover:text-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-600 disabled:cursor-not-allowed disabled:text-slate-400"
-                  [disabled]="form.disabled"
-                  [attr.aria-label]="
-                    showPassword ? 'Hide password' : 'Show password'
-                  "
-                  (click)="togglePasswordVisibility()"
-                >
-                  {{ showPassword ? "Hide" : "Show" }}
-                </button>
-              </div>
-              <p
-                id="user-password-help"
-                class="mt-2 text-xs leading-5 text-slate-500"
-              >
-                At least 8 characters with uppercase, lowercase, and a number.
-              </p>
-              <p
-                *ngIf="
-                  form.controls.password.touched &&
-                  form.controls.password.invalid
-                "
-                id="user-password-error"
-                class="mt-2 text-sm text-rose-700"
-                role="alert"
-              >
-                Use at least 8 characters with uppercase, lowercase, and a
-                number.
-              </p>
-            </div>
-
-            <div>
-              <label
-                class="block text-sm font-semibold text-slate-800"
-                for="user-role"
-              >
-                Role
-              </label>
-              <select
-                id="user-role"
-                class="mt-2 block w-full border border-slate-300 bg-white px-3.5 py-3 text-sm text-slate-950 outline-none transition focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/20 disabled:cursor-not-allowed disabled:bg-slate-100"
-                formControlName="role"
-                (change)="onRoleChange(form.controls.role.value)"
-                aria-describedby="user-role-help"
-              >
-                <option *ngFor="let option of roleOptions" [value]="option.value">
-                  {{ option.label }}
-                </option>
-              </select>
-              <p
-                id="user-role-help"
-                class="mt-2 text-xs leading-5 text-slate-500"
-              >
-                Select the user's role. Changing the role updates default permissions.
-              </p>
-            </div>
-
-            <fieldset class="space-y-3">
-              <legend class="block text-sm font-semibold text-slate-800">
-                Permissions
-              </legend>
-              <p class="text-xs leading-5 text-slate-500">
-                Select the permissions granted to this user.
-              </p>
-              <div
-                class="space-y-3 rounded border border-slate-200 bg-slate-50/60 p-4"
-              >
-                <div
-                  *ngFor="let perm of permissionOptions"
-                  class="flex items-start gap-3"
-                >
-                  <div class="flex h-5 items-center">
-                    <input
-                      [id]="'perm-' + perm.value"
-                      type="checkbox"
-                      class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-600/20 disabled:cursor-not-allowed"
-                      [checked]="isPermissionSelected(perm.value)"
-                      [disabled]="form.disabled"
-                      (change)="togglePermission(perm.value, $event)"
-                    />
-                  </div>
-                  <div class="text-xs leading-5">
-                    <label
-                      [for]="'perm-' + perm.value"
-                      class="cursor-pointer font-medium text-slate-900"
-                    >
-                      {{ perm.label }}
-                    </label>
-                    <p class="text-slate-500">{{ perm.description }}</p>
-                  </div>
-                </div>
-              </div>
-              <p
-                *ngIf="
-                  form.controls.permissions.touched &&
-                  form.controls.permissions.invalid
-                "
-                class="text-sm text-rose-700"
-                role="alert"
-              >
-                At least one permission must be selected.
-              </p>
-            </fieldset>
-
-            <ng-container *ngIf="creationState$ | async as state">
-              <p
-                *ngIf="state.status === 'loading'"
-                class="flex items-center gap-2 text-sm text-slate-600"
-                aria-busy="true"
-                role="status"
-              >
-                <span
-                  class="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-indigo-600"
-                  aria-hidden="true"
-                ></span>
-                {{ isEditMode ? "Saving changes..." : "Creating user..." }}
-              </p>
-              <p
-                *ngIf="state.status === 'success'"
-                class="border border-emerald-200 bg-emerald-50 px-3.5 py-3 text-sm text-emerald-800"
-                role="status"
-              >
-                {{
-                  isEditMode
-                    ? "User updated successfully."
-                    : "User created successfully. They can now sign in with this email and password."
-                }}
-              </p>
-              <p
-                *ngIf="state.status === 'error'"
-                class="border border-rose-200 bg-rose-50 px-3.5 py-3 text-sm text-rose-800"
-                role="alert"
-              >
-                {{ state.error?.message }}
-              </p>
-            </ng-container>
-
-            <div
-              class="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end"
-            >
-              <button
-                type="button"
-                class="border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                [disabled]="form.disabled"
-                (click)="cancel()"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                class="flex items-center justify-center gap-2 bg-indigo-700 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-indigo-300 sm:min-w-36"
-                [disabled]="form.disabled"
-              >
-                <span
-                  *ngIf="form.disabled"
-                  class="h-4 w-4 animate-spin rounded-full border-2 border-indigo-200 border-t-white"
-                  aria-hidden="true"
-                ></span>
-                {{
-                  form.disabled
-                    ? isEditMode
-                      ? "Saving..."
-                      : "Creating..."
-                    : isEditMode
-                      ? "Save user"
-                      : "Create user"
-                }}
-              </button>
-            </div>
-          </form>
-
-          <p
-            class="mt-8 border-t border-slate-200 pt-5 text-xs leading-5 text-slate-500"
-          >
-            Configured roles and permissions are saved directly with the user's
-            profile and enforced across the workspace.
-          </p>
-        </div>
-      </section>
+      <div>
+        <span class="block text-xs uppercase tracking-wider text-muted font-semibold">Selected role</span>
+        <span class="font-medium text-ink">{{ getRoleLabel(form.controls.role.value) }}</span>
+      </div>
+      <div class="h-7 w-px bg-line"></div>
+      <div>
+        <span class="block text-xs uppercase tracking-wider text-muted font-semibold">Permissions</span>
+        <span class="font-medium text-ink">{{ form.controls.permissions.value.length }} granted</span>
+      </div>
     </div>
-  </div>
+  </header>
+
+  <ng-container *ngIf="creationState$ | async as state">
+    <div
+      *ngIf="state.status === 'error'"
+      class="rounded-panel border border-danger-50 bg-danger-50 p-4 text-sm font-medium text-danger-700"
+      role="alert"
+    >
+      {{ state.error?.message }}
+    </div>
+    <div
+      *ngIf="state.status === 'success'"
+      class="rounded-panel border border-success-50 bg-success-50 p-4 text-sm font-medium text-success-700"
+      role="status"
+    >
+      {{
+        isEditMode
+          ? "User updated successfully."
+          : "User created successfully. They can now sign in with this email and password."
+      }}
+    </div>
+  </ng-container>
+
+  <form
+    class="space-y-8 rounded-panel border border-line bg-surface p-6 shadow-surface sm:p-8"
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    [attr.aria-label]="isEditMode ? 'Edit user' : 'Create user'"
+  >
+    <section>
+      <div class="mb-5">
+        <h2 class="text-lg font-semibold text-ink">Account details</h2>
+        <p class="mt-1 text-sm text-muted">
+          Basic profile information used for authentication and workspace identification.
+        </p>
+      </div>
+
+      <div class="grid gap-6 sm:grid-cols-2">
+        <div>
+          <label class="block text-sm font-semibold text-ink" for="user-name">
+            Full name <span class="text-danger-700" aria-hidden="true">*</span>
+          </label>
+          <input
+            id="user-name"
+            class="mt-2 h-11 w-full rounded-control border border-line bg-surface px-3.5 text-sm text-ink shadow-surface outline-none transition duration-standard placeholder:text-muted focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:bg-canvas"
+            [class.border-danger-600]="
+              form.controls.name.touched && form.controls.name.invalid
+            "
+            formControlName="name"
+            type="text"
+            autocomplete="name"
+            placeholder="e.g. Alex Morgan"
+            aria-describedby="user-name-error"
+          />
+          <p
+            *ngIf="form.controls.name.touched && form.controls.name.invalid"
+            id="user-name-error"
+            class="mt-1.5 text-xs font-medium text-danger-700"
+            role="alert"
+          >
+            Enter the user's name.
+          </p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-ink" for="user-email">
+            Email address <span class="text-danger-700" aria-hidden="true">*</span>
+          </label>
+          <input
+            id="user-email"
+            class="mt-2 h-11 w-full rounded-control border border-line bg-surface px-3.5 text-sm text-ink shadow-surface outline-none transition duration-standard placeholder:text-muted focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:bg-canvas"
+            [class.border-danger-600]="
+              form.controls.email.touched && form.controls.email.invalid
+            "
+            formControlName="email"
+            type="email"
+            autocomplete="email"
+            placeholder="alex@example.com"
+            autocapitalize="none"
+            spellcheck="false"
+            aria-describedby="user-email-error"
+          />
+          <p
+            *ngIf="form.controls.email.touched && form.controls.email.invalid"
+            id="user-email-error"
+            class="mt-1.5 text-xs font-medium text-danger-700"
+            role="alert"
+          >
+            Enter a valid email address.
+          </p>
+        </div>
+
+        <div *ngIf="!isEditMode" class="sm:col-span-2">
+          <label class="block text-sm font-semibold text-ink" for="user-password">
+            Password <span class="text-danger-700" aria-hidden="true">*</span>
+          </label>
+          <div class="relative mt-2 max-w-md">
+            <input
+              id="user-password"
+              class="h-11 w-full rounded-control border border-line bg-surface px-3.5 pr-20 text-sm text-ink shadow-surface outline-none transition duration-standard placeholder:text-muted focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:bg-canvas"
+              [class.border-danger-600]="
+                form.controls.password.touched && form.controls.password.invalid
+              "
+              formControlName="password"
+              [type]="showPassword ? 'text' : 'password'"
+              autocomplete="new-password"
+              placeholder="••••••••"
+              aria-describedby="user-password-help user-password-error"
+            />
+            <button
+              type="button"
+              class="absolute inset-y-0 right-0 px-3.5 text-xs font-semibold text-muted hover:text-brand-600 focus:outline-none disabled:cursor-not-allowed disabled:text-muted"
+              [disabled]="form.disabled"
+              [attr.aria-label]="
+                showPassword ? 'Hide password' : 'Show password'
+              "
+              (click)="togglePasswordVisibility()"
+            >
+              {{ showPassword ? "Hide" : "Show" }}
+            </button>
+          </div>
+          <p id="user-password-help" class="mt-1.5 text-xs text-muted">
+            At least 8 characters with uppercase, lowercase, and a number.
+          </p>
+          <p
+            *ngIf="
+              form.controls.password.touched && form.controls.password.invalid
+            "
+            id="user-password-error"
+            class="mt-1.5 text-xs font-medium text-danger-700"
+            role="alert"
+          >
+            Use at least 8 characters with uppercase, lowercase, and a number.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="border-t border-line pt-8">
+      <div class="mb-5">
+        <h2 class="text-lg font-semibold text-ink">Role and governance</h2>
+        <p class="mt-1 text-sm text-muted">
+          Assign an organizational role to set appropriate initial permissions.
+        </p>
+      </div>
+
+      <div class="max-w-md">
+        <label class="block text-sm font-semibold text-ink" for="user-role">
+          Role
+        </label>
+        <select
+          id="user-role"
+          class="mt-2 h-11 w-full rounded-control border border-line bg-surface px-3.5 text-sm text-ink shadow-surface outline-none transition duration-standard focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:bg-canvas"
+          formControlName="role"
+          (change)="onRoleChange(form.controls.role.value)"
+          aria-describedby="user-role-help"
+        >
+          <option *ngFor="let option of roleOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+        <p id="user-role-help" class="mt-1.5 text-xs text-muted">
+          Select the user's role. Changing the role updates default permissions.
+        </p>
+      </div>
+    </section>
+
+    <section class="border-t border-line pt-8">
+      <fieldset class="space-y-4">
+        <div>
+          <legend class="block text-sm font-semibold text-ink">
+            Permissions
+          </legend>
+          <p class="mt-1 text-xs text-muted">
+            Select the granular capabilities granted to this user.
+          </p>
+        </div>
+
+        <div
+          class="grid gap-3 rounded-panel border border-line bg-canvas p-4 sm:p-5 sm:grid-cols-2"
+        >
+          <div
+            *ngFor="let perm of permissionOptions"
+            class="flex items-start gap-3 rounded-control border border-line/80 bg-surface p-3.5 shadow-surface transition duration-standard hover:border-brand-500/50"
+          >
+            <div class="flex h-5 items-center">
+              <input
+                [id]="'perm-' + perm.value"
+                type="checkbox"
+                class="h-4 w-4 rounded-control border-line text-brand-600 focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed"
+                [checked]="isPermissionSelected(perm.value)"
+                [disabled]="form.disabled"
+                (change)="togglePermission(perm.value, $event)"
+              />
+            </div>
+            <div class="text-xs leading-5">
+              <label
+                [for]="'perm-' + perm.value"
+                class="cursor-pointer font-semibold text-ink"
+              >
+                {{ perm.label }}
+              </label>
+              <p class="text-muted">{{ perm.description }}</p>
+            </div>
+          </div>
+        </div>
+
+        <p
+          *ngIf="
+            form.controls.permissions.touched &&
+            form.controls.permissions.invalid
+          "
+          class="text-xs font-medium text-danger-700"
+          role="alert"
+        >
+          At least one permission must be selected.
+        </p>
+      </fieldset>
+    </section>
+
+    <div
+      *ngIf="(creationState$ | async)?.status === 'loading'"
+      class="flex items-center gap-2 text-sm text-muted"
+      aria-busy="true"
+      role="status"
+    >
+      <svg
+        class="h-4 w-4 animate-spin text-brand-600"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
+        <circle
+          class="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4"
+        ></circle>
+        <path
+          class="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+        ></path>
+      </svg>
+      <span>{{ isEditMode ? "Saving changes..." : "Creating user..." }}</span>
+    </div>
+
+    <div
+      class="flex flex-col-reverse gap-3 border-t border-line pt-6 sm:flex-row sm:justify-end"
+    >
+      <button
+        type="button"
+        class="inline-flex items-center justify-center rounded-control border border-line bg-surface px-4 py-2.5 text-sm font-semibold text-muted shadow-surface transition duration-standard hover:border-brand-500 hover:bg-brand-50 hover:text-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+        [disabled]="form.disabled"
+        (click)="cancel()"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="inline-flex items-center justify-center gap-2 rounded-control bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-surface transition duration-standard hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-36"
+        [disabled]="form.disabled"
+      >
+        <svg
+          *ngIf="form.disabled && (creationState$ | async)?.status === 'loading'"
+          class="h-4 w-4 animate-spin text-white"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          ></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+          ></path>
+        </svg>
+        <span>
+          {{
+            form.disabled && (creationState$ | async)?.status === "loading"
+              ? isEditMode
+                ? "Saving..."
+                : "Creating..."
+              : isEditMode
+                ? "Save user"
+                : "Create user"
+          }}
+        </span>
+      </button>
+    </div>
+  </form>
 </main>

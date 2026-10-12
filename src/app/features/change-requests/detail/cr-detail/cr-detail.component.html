@@ -4,20 +4,20 @@
 >
   <button
     type="button"
-    class="text-sm font-semibold text-brand-600 transition duration-standard hover:text-brand-700"
+    class="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 transition duration-standard hover:text-brand-700 focus:outline-none focus:underline"
     (click)="onBack()"
   >
     <span aria-hidden="true">←</span>
     Back to change requests
   </button>
 
-  <section *ngIf="vm$ | async as vm">
+  <section *ngIf="vm$ | async as vm" class="space-y-6">
     <div
       *ngIf="vm.state === 'loading'"
       class="rounded-panel border border-line bg-surface p-8 text-center shadow-surface"
       aria-busy="true"
     >
-      <div class="flex items-center justify-center gap-3 text-muted">
+      <div class="flex items-center justify-center gap-3 text-sm font-medium text-muted">
         <svg
           class="h-5 w-5 animate-spin text-brand-600"
           viewBox="0 0 24 24"
@@ -38,7 +38,7 @@
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
           ></path>
         </svg>
-        Loading change request...
+        <span>Loading change request...</span>
       </div>
     </div>
 
@@ -53,14 +53,14 @@
     <ng-container *ngIf="vm.changeRequest as cr">
       <div
         *ngIf="vm.errorMessage"
-        class="mb-4 rounded-panel border border-danger-50 bg-danger-50 p-4 text-danger-700"
+        class="rounded-panel border border-danger-50 bg-danger-50 p-4 text-sm font-medium text-danger-700"
         role="alert"
       >
         {{ vm.errorMessage }}
       </div>
       <div
         *ngIf="vm.successMessage"
-        class="mb-4 rounded-panel border border-success-50 bg-success-50 p-4 text-success-700"
+        class="rounded-panel border border-success-50 bg-success-50 p-4 text-sm font-medium text-success-700"
         role="status"
         aria-live="polite"
       >
@@ -83,52 +83,64 @@
             </h1>
           </div>
           <span
-            class="inline-flex w-fit rounded-pill px-3 py-1 text-sm font-semibold"
+            class="inline-flex items-center gap-1.5 rounded-pill px-3 py-1 text-xs font-semibold"
             [ngClass]="{
-              'bg-canvas text-muted': cr.status === 'draft',
-              'bg-warning-50 text-warning-700': cr.status === 'pending_review',
-              'bg-success-50 text-success-700': cr.status === 'approved',
-              'bg-danger-50 text-danger-700': cr.status === 'rejected',
+              'border border-line bg-canvas text-muted': cr.status === 'draft',
+              'border border-warning-600/20 bg-warning-50 text-warning-700': cr.status === 'pending_review',
+              'border border-success-600/20 bg-success-50 text-success-700': cr.status === 'approved',
+              'border border-danger-600/20 bg-danger-50 text-danger-700': cr.status === 'rejected',
             }"
           >
-            {{ cr.status.replace("_", " ") }}
+            <span
+              class="h-1.5 w-1.5 rounded-full"
+              [ngClass]="{
+                'bg-muted': cr.status === 'draft',
+                'bg-warning-600': cr.status === 'pending_review',
+                'bg-success-600': cr.status === 'approved',
+                'bg-danger-600': cr.status === 'rejected',
+              }"
+              aria-hidden="true"
+            ></span>
+            <span>{{ cr.status.replace("_", " ") }}</span>
           </span>
         </div>
         <dl class="mt-6 grid gap-4 border-t border-line pt-5 sm:grid-cols-3">
-          <div>
+          <div class="rounded-control border border-line/60 bg-canvas/60 p-3.5">
             <dt
-              class="text-xs font-semibold uppercase tracking-wide text-muted"
+              class="text-xs font-semibold uppercase tracking-wider text-muted"
             >
               Requester
             </dt>
-            <dd class="mt-1 font-medium text-ink">{{ cr.createdBy.name }}</dd>
+            <dd class="mt-1 font-semibold text-ink">{{ cr.createdBy.name }}</dd>
           </div>
-          <div>
+          <div class="rounded-control border border-line/60 bg-canvas/60 p-3.5">
             <dt
-              class="text-xs font-semibold uppercase tracking-wide text-muted"
+              class="text-xs font-semibold uppercase tracking-wider text-muted"
             >
               Submitted
             </dt>
-            <dd class="mt-1 font-medium text-ink">
+            <dd class="mt-1 font-semibold text-ink">
               {{ cr.createdAt | date: "mediumDate" }}
             </dd>
           </div>
-          <div>
+          <div class="rounded-control border border-line/60 bg-canvas/60 p-3.5">
             <dt
-              class="text-xs font-semibold uppercase tracking-wide text-muted"
+              class="text-xs font-semibold uppercase tracking-wider text-muted"
             >
               Changes
             </dt>
-            <dd class="mt-1 font-medium text-ink">{{ cr.changeCount }}</dd>
+            <dd class="mt-1 font-semibold text-ink">{{ cr.changeCount }}</dd>
           </div>
         </dl>
         <div class="mt-6 border-t border-line pt-5">
-          <h2 class="text-sm font-semibold uppercase tracking-wide text-muted">
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-muted">
             Reason for change
           </h2>
-          <p class="mt-2 max-w-3xl whitespace-pre-line leading-7 text-ink">
-            {{ cr.description }}
-          </p>
+          <div class="mt-2.5 rounded-control border border-line/60 bg-canvas/60 p-4">
+            <p class="max-w-3xl whitespace-pre-line text-sm leading-relaxed text-ink">
+              {{ cr.description }}
+            </p>
+          </div>
         </div>
       </header>
 

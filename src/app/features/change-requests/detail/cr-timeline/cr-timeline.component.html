@@ -1,21 +1,38 @@
-<section class="rounded-panel border border-line bg-surface p-6 shadow-surface">
-  <h2 class="text-lg font-semibold text-ink">Approval timeline</h2>
-  <p class="mt-1 text-sm text-muted">
-    A chronological record of activity on this request.
-  </p>
-  <ol class="mt-4 space-y-4">
+<section class="rounded-panel border border-line bg-surface p-6 shadow-surface sm:p-8">
+  <div class="mb-5">
+    <h2 class="text-lg font-semibold text-ink">Approval timeline</h2>
+    <p class="mt-1 text-sm text-muted">
+      A chronological record of activity and decisions on this request.
+    </p>
+  </div>
+
+  <ol class="relative ml-2.5 space-y-0 border-l border-line pl-6">
     <li
       *ngFor="let event of chronologicalEvents; trackBy: trackById"
       data-testid="timeline-event"
-      class="border-l-2 border-brand-100 pl-4"
+      class="relative pb-6 last:pb-1"
     >
-      <p class="font-semibold capitalize text-ink">{{ event.type }}</p>
-      <p class="text-sm text-muted">
-        {{ event.actor.name }} · {{ event.at | date: "medium" }}
+      <span
+        class="absolute -left-[31px] top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 border-surface bg-brand-600 ring-4 ring-canvas"
+        aria-hidden="true"
+      ></span>
+      <div class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+        <p class="text-sm font-semibold capitalize text-ink">
+          {{ event.type }}
+        </p>
+        <time class="text-xs text-muted">
+          {{ event.at | date: "medium" }}
+        </time>
+      </div>
+      <p class="text-xs text-muted">
+        By <strong class="font-medium text-ink">{{ event.actor.name }}</strong>
       </p>
-      <p *ngIf="event.note" class="mt-1 text-sm leading-6 text-ink">
+      <div
+        *ngIf="event.note"
+        class="mt-2.5 rounded-control border border-line bg-canvas/80 p-3 text-sm leading-relaxed text-ink"
+      >
         {{ event.note }}
-      </p>
+      </div>
     </li>
   </ol>
 </section>

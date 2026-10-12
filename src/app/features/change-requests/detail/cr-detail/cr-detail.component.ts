@@ -5,7 +5,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, of, Subject } from 'rxjs';
 import {
   catchError,
   finalize,
@@ -54,22 +54,33 @@ export class CrDetailComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.route.paramMap
+    const authState$ = this.authService.state$ ?? of(null);
+    combineLatest([this.route.paramMap, authState$])
       .pipe(
-        switchMap((params) =>
-          this.service.getChangeRequest(params.get('id') ?? '').pipe(
+        switchMap(([params]) => {
+          const id = params.get('id') ?? '';
+          if (!id) {
+            return of(
+              this.viewModel(
+                'error',
+                null,
+                'Unable to load this change request. Please try again.',
+              ),
+            );
+          }
+          return this.service.getChangeRequest(id).pipe(
             map((changeRequest) => this.viewModel('loaded', changeRequest)),
-            catchError(() => {
-              return [
+            catchError(() =>
+              of(
                 this.viewModel(
                   'error',
                   null,
                   'Unable to load this change request. Please try again.',
                 ),
-              ];
-            }),
-          ),
-        ),
+              ),
+            ),
+          );
+        }),
         takeUntil(this.destroy$),
       )
       .subscribe((viewModel) => this.vmSubject.next(viewModel));
@@ -129,13 +140,12 @@ export class CrDetailComponent implements OnInit, OnDestroy {
               : 'Change request rejected successfully.',
           ),
         ),
-        catchError(() => [
-          this.viewModel(
-            'loaded',
-            current,
-            'The action failed. Your changes were not saved.',
-          ),
-        ]),
+        catchError((error: unknown) => {
+          const message =
+            (error as { error?: { message?: string } })?.error?.message ??
+            'The action failed. Your changes were not saved.';
+          return [this.viewModel('loaded', current, message)];
+        }),
         finalize(() => {
           this.actionInFlight = false;
         }),
